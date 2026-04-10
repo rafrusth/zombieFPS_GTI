@@ -20,9 +20,11 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <stdio.h>
+#include <iostream>
+#include <string>
 
 // ===================== KAMUS GLOBAL ===================== //
-bool keys[256] = { false };
+bool keys[256] = {false};
 
 /* === VARIABEL KAMERA === */
 int viewMode = 1;
@@ -65,9 +67,9 @@ void setMaterial(float r, float g, float b) {
     /* === KAMUS LOKAL === */
 
     /* === ALGORITMA === */
-    GLfloat mat_ambient[] = { r * 0.3f, g * 0.3f, b * 0.3f, 1.0f };
-    GLfloat mat_diffuse[] = { r, g, b, 1.0f };
-    GLfloat mat_specular[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+    GLfloat mat_ambient[] = {r * 0.3f, g * 0.3f, b * 0.3f, 1.0f};
+    GLfloat mat_diffuse[] = {r, g, b, 1.0f};
+    GLfloat mat_specular[] = {0.3f, 0.3f, 0.3f, 1.0f};
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
@@ -418,7 +420,7 @@ void zombieAttack() {
 
         // Logika menyerang
         currentTime = glutGet(GLUT_ELAPSED_TIME);
-        if (dist <= 1) {
+        if (dist <= 0.25f) {
             if (currentTime - lastDamageTime > damageDelay) {
                 playerHealth -= 10;
                 lastDamageTime = currentTime;
@@ -528,6 +530,17 @@ void init() {
 }
 
 // ===================== DISPLAY ===================== //
+void renderText(float x, float y, void* font, const char* string) {
+    /* === KAMUS LOKAL === */
+    const char* c;
+
+    /* === ALGORITMA === */
+    glRasterPos2f(x, y);
+    for (c = string; *c != '\0'; c++) {
+        glutBitmapCharacter(font, *c);
+    }
+}
+
 void display() {
     /* === KAMUS LOKAL === */
 
@@ -590,12 +603,45 @@ void display() {
         drawZombie();
     glPopMatrix();
 
-    // HUD tangan hanya untuk FPS / 1-point
+    // HUD tangan hanya untuk First Person
     if (viewMode == 1) {
         glClear(GL_DEPTH_BUFFER_BIT);
         glDisable(GL_COLOR_MATERIAL);
         drawHand(0.7f, 15.0f, recoil);
     }
+
+    // Game Over
+    glDisable(GL_LIGHTING);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, 1280, 0, 720);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+            glLoadIdentity();
+            char healthText[50];
+            sprintf(healthText, "Health: %.0f", playerHealth);
+
+            if (playerHealth >= 70) {
+                glColor3f(0.0f, 1.0f, 0.0f);
+            } else if (playerHealth > 30 && playerHealth < 70) {
+                glColor3f(1.0f, 1.0f, 0.0f);
+            }  else {
+                glColor3f(1.0f, 0.0f ,0.0f);
+            }
+
+            renderText(50, 680, GLUT_BITMAP_9_BY_15, healthText);
+
+            if (isDead) {
+                glColor3f(1.0f, 1.0f, 1.0f);
+                renderText(580, 360, GLUT_BITMAP_9_BY_15, "Game Over");
+            }
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_LIGHTING);
+
     glutSwapBuffers();
 }
 
@@ -742,7 +788,7 @@ void reshape(int width, int height) {
     glViewport(0, 0, (GLsizei) width, (GLsizei) height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (GLfloat) width / (GLfloat) height, 0.1, 200.0);
+    gluPerspective(45.0, (GLfloat) width / (GLfloat) height, 0.01, 200.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
