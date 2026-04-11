@@ -1,4 +1,4 @@
-/*  Nama File   :   BlockyZombieFPS.cpp
+/*  Nama File   :   ZombieFPS_Diem.cpp
     Matakuliah  :   Grafik dan Teknik Interaktif 
     Kelompok    :   6
     Anggota     :   Rafif Setya Imaduddin  24060124130115

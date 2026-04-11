@@ -1,3 +1,21 @@
+/*  Nama File   :   ZombieFPS_Gerak.cpp
+    Matakuliah  :   Grafik dan Teknik Interaktif 
+    Kelompok    :   6
+    Anggota     :   Rafif Setya Imaduddin  24060124130115
+                    Raffi Arditama         24060124120020
+                    Felicia Evelina        24060124120012
+                    Anggita Kirana Puspa   24060124130064
+    Keyboard    :   w = Jalan ke Depan
+                    a = Jalan ke Kiri
+                    d = Jalan ke Kanan
+                    s = Jalan ke Belakang
+                    1 = 1-Point Perspective Mode
+                    2 = 2-Point Perspective Mode
+                    3 = 3-Point Perspective Mode
+                    4 = Orthographic Perspective Mode
+                    Mouse Left Click = Menembak
+*/
+
 #define _USE_MATH_DEFINES
 #include <GL/glut.h>
 #include <math.h>
