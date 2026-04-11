@@ -32,6 +32,8 @@ int viewMode = 1;
 float recoil = 0.0f;
 float camAngleX = 0.0f;
 float camAngleY = 0.0f;
+float orthoZoom = 6.0f;
+float camDist = 5.0f;
 bool isShooting = false;
 
 /* === POSISI KAMERA / PEMAIN === */
@@ -52,7 +54,7 @@ int damageDelay = 1000;
 // Zombie scale 0.5x, titik bawah sepatu di Y = -0.72 (sebelum scale)
 // Setelah scale 0.5: -0.72 * 0.5 = -0.36 → zomY = -1.0 + 0.36 = -0.64
 float zomX = 0.0f;
-float zomY = -0.64f;
+float zomY = -0.3f;
 float zomZ = 3.0f;
 
 /* === POSE ZOMBIE === */
@@ -325,21 +327,6 @@ void drawHand(float xPos, float rotation, float currentRecoil) {
     glPopMatrix();
 }
 
-// ===================== PROJECTION HELPER ===================== //
-void applyProjection() {
-    float aspect = (float)winWidth / (float)winHeight;
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    if (viewMode == 4) {
-        // ORTHOGRAPHIC: tidak ada vanishing point, ukuran objek seragam
-        glOrtho(-6.0*aspect, 6.0*aspect, -6.0, 6.0, 0.01, 200.0);
-    } else {
-        // PERSPECTIVE: mode 1, 2, 3
-        gluPerspective(45.0, aspect, 0.01, 200.0);
-    }
-    glMatrixMode(GL_MODELVIEW);
-}
-
 // ===================== INIT ===================== //
 void init() {
     glEnable(GL_DEPTH_TEST);
@@ -403,26 +390,24 @@ void display() {
         case 2: {
             // Third person samping: kamera 3 unit di belakang & 2 unit di atas pemain
             float rad = camAngleY * M_PI / 180.0f;
-            float camDist = 3.0f;
             float eyeX = posX - sin(rad) * camDist;
-            float eyeY = posY + 2.0f;
+            float eyeY = posY;
             float eyeZ = posZ + cos(rad) * camDist;
             gluLookAt(eyeX, eyeY, eyeZ,
-                      posX, posY, posZ,
-                      0, 1, 0);
+                        posX, posY, posZ,
+                        0, 1, 0);
             break;
         }
 
         case 3: {
             // Third person atas: kamera 4 unit di belakang & 4 unit di atas
             float rad = camAngleY * M_PI / 180.0f;
-            float camDist = 4.0f;
             float eyeX = posX - sin(rad) * camDist;
-            float eyeY = posY + 4.0f;
+            float eyeY = posY + camDist;
             float eyeZ = posZ + cos(rad) * camDist;
             gluLookAt(eyeX, eyeY, eyeZ,
-                      posX, posY, posZ,
-                      0, 1, 0);
+                        posX, posY, posZ,
+                        0, 1, 0);
             break;
         }
 
@@ -430,13 +415,13 @@ void display() {
             // Orthographic: kamera atas-belakang mengikuti pemain
             // Projection matrix sudah glOrtho di applyProjection()
             float rad = camAngleY * M_PI / 180.0f;
-            float camDist = 5.0f;
+            float camDist = 10.0f;
             float eyeX = posX - sin(rad) * camDist;
-            float eyeY = posY + 5.0f;
+            float eyeY = posY + 10.0f;
             float eyeZ = posZ + cos(rad) * camDist;
             gluLookAt(eyeX, eyeY, eyeZ,
-                      posX, posY, posZ,
-                      0, 1, 0);
+                        posX, posY, posZ,
+                        0, 1, 0);
             break;
         }
     }
@@ -499,19 +484,19 @@ void display() {
             // Label mode aktif
             glColor3f(1,1,1);
             switch(viewMode) {
-                case 1: renderText(50,700,GLUT_BITMAP_9_BY_15,"[1] 1-Point Perspective (FPS)"); break;
-                case 2: renderText(50,700,GLUT_BITMAP_9_BY_15,"[2] 2-Point Perspective (3rd Person)"); break;
-                case 3: renderText(50,700,GLUT_BITMAP_9_BY_15,"[3] 3-Point Perspective (3rd Person Atas)"); break;
-                case 4: renderText(50,700,GLUT_BITMAP_9_BY_15,"[4] Orthographic"); break;
+                case 1: renderText(50,690,GLUT_BITMAP_9_BY_15,"[1] 1-Point Perspective (FPS)"); break;
+                case 2: renderText(50,690,GLUT_BITMAP_9_BY_15,"[2] 2-Point Perspective (3rd Person)"); break;
+                case 3: renderText(50,690,GLUT_BITMAP_9_BY_15,"[3] 3-Point Perspective (3rd Person Atas)"); break;
+                case 4: renderText(50,690,GLUT_BITMAP_9_BY_15,"[4] Orthographic"); break;
             }
 
             // Panduan kontrol
             glColor3f(0.9f,0.9f,0.9f);
-            renderText(950,700,GLUT_BITMAP_8_BY_13,"W/A/S/D : Gerak");
-            renderText(950,685,GLUT_BITMAP_8_BY_13,"Mouse   : Lihat");
-            renderText(950,670,GLUT_BITMAP_8_BY_13,"LClick  : Tembak");
-            renderText(950,655,GLUT_BITMAP_8_BY_13,"1/2/3/4 : Proyeksi");
-            renderText(950,640,GLUT_BITMAP_8_BY_13,"ESC     : Keluar");
+            renderText(1050,700,GLUT_BITMAP_8_BY_13,"W/A/S/D     : Gerak");
+            renderText(1050,685,GLUT_BITMAP_8_BY_13,"Mouse       : Lihat");
+            renderText(1050,670,GLUT_BITMAP_8_BY_13,"Left-Click  : Tembak");
+            renderText(1050,655,GLUT_BITMAP_8_BY_13,"1/2/3/4     : Proyeksi");
+            renderText(1050,640,GLUT_BITMAP_8_BY_13,"ESC         : Keluar");
 
             // Health bar
             float barW=300, barH=25, bx=50, by=650;
@@ -560,6 +545,22 @@ void display() {
     glutSwapBuffers();
 }
 
+void applyProjection() {
+    float aspect = (float)winWidth / (float)winHeight;
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    if (viewMode == 4) {
+        // Orthographic: Objek tidak mengecil saat jauh.
+        // Ganti angka 6.0 dengan variabel 'zoom' jika ingin bisa zoom in/out
+        glOrtho(-orthoZoom * aspect, orthoZoom * aspect, -orthoZoom, orthoZoom, 0.1, 1000.0);
+    } else {
+        // Perspective: Mode 1, 2, 3
+        gluPerspective(45.0, aspect, 0.01, 200.0);
+    }
+    glMatrixMode(GL_MODELVIEW);
+}
+
 // ===================== KEYBOARD ===================== //
 void keyboard(unsigned char key, int x, int y) {
     if (key == 27) exit(0);
@@ -580,7 +581,19 @@ void updateMovement() {
     if (keys['2']) viewMode = 2;
     if (keys['3']) viewMode = 3;
     if (keys['4']) viewMode = 4;
-    if (viewMode != prevMode) applyProjection();
+    if (keys['+']) {
+        orthoZoom -= 0.1f;
+        camDist -= 0.1f;
+        applyProjection();
+    }
+    if (keys['-']) {
+        orthoZoom += 0.1f;
+        camDist += 0.1f;
+        applyProjection();
+    }
+    if (viewMode != prevMode) {
+        applyProjection();
+    };
 }
 
 // ===================== TIMER ===================== //
@@ -610,7 +623,7 @@ void mouseClick(int b, int s, int x, int y) {
     if (b == GLUT_LEFT_BUTTON) isShooting = (s == GLUT_DOWN);
 }
 
-// ===================== RESHAPE ===================== //
+// ===================== PROYEKSI ===================== //
 void reshape(int width, int height) {
     if (height == 0) height = 1;
     winWidth=width; winHeight=height;
