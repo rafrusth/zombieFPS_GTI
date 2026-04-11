@@ -32,13 +32,13 @@ int viewMode = 1;
 float recoil = 0.0f;
 float camAngleX = 0.0f;
 float camAngleY = 0.0f;
-float orthoZoom = 6.0f;
-float camDist = 5.0f;
+float camDist = 3.0f;
+float eyeOffset = 0.13f;
 bool isShooting = false;
 
-/* === POSISI KAMERA / PEMAIN === */
+/* === POSISI PEMAIN === */
 float posX = 0.0f;
-float posY = 0.0f;   // tinggi mata pemain dari lantai (lantai di Y=-1)
+float posY = -0.37f;   // tinggi mata pemain dari lantai (lantai di Y=-1)
 float posZ = 5.0f;
 
 /* === PLAYER & GAME STATE === */
@@ -54,7 +54,7 @@ int damageDelay = 1000;
 // Zombie scale 0.5x, titik bawah sepatu di Y = -0.72 (sebelum scale)
 // Setelah scale 0.5: -0.72 * 0.5 = -0.36 → zomY = -1.0 + 0.36 = -0.64
 float zomX = 0.0f;
-float zomY = -0.3f;
+float zomY = -0.52f;
 float zomZ = 3.0f;
 
 /* === POSE ZOMBIE === */
@@ -63,8 +63,8 @@ static int rightShoulder = -90;
 static int leftShoulder  = -90;
 
 /* === GERAK & ARAH ZOMBIE === */
-float zomSpeed     = 0.01f;
-float zomAngleY    = 0.0f;
+float zomSpeed = 0.01f;
+float zomAngleY = 0.0f;
 float stopDistance = 0.5f;
 
 /* === POSISI MATAHARI === */
@@ -211,12 +211,13 @@ void drawZombie() {
 // ===================== BODY PLAYER (untuk mode 2 & 3) ===================== //
 // Tubuh player sederhana agar terlihat di third-person view
 // Digambar di posisi (posX, posY, posZ) dengan rotasi menghadap arah kamera
-void drawPlayer() {
+void drawPlayer(float size) {
     /* === KAMUS LOKAL === */
 
     /* === ALGORITMA === */
     glPushMatrix();
         glTranslatef(posX, posY, posZ);
+        glScalef(size, size, size);
         glRotatef(camAngleY, 0, 1, 0); // menghadap arah pandang pemain
 
         // Badan
@@ -384,7 +385,7 @@ void display() {
             // FPS: rotasi di titik asal lalu geser ke posisi pemain
             glRotatef(camAngleX, 1, 0, 0);
             glRotatef(camAngleY, 0, 1, 0);
-            glTranslatef(-posX, -posY, -posZ);
+            glTranslatef(-posX, -(posY + eyeOffset), -posZ);
             break;
 
         case 2: {
@@ -460,7 +461,7 @@ void display() {
     if (viewMode != 1) {
         glEnable(GL_COLOR_MATERIAL);
         glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-        drawPlayer();
+        drawPlayer(0.5f);
     }
 
     // HUD tangan hanya di mode 1 (FPS)
@@ -495,6 +496,7 @@ void display() {
             renderText(1050,700,GLUT_BITMAP_8_BY_13,"W/A/S/D     : Gerak");
             renderText(1050,685,GLUT_BITMAP_8_BY_13,"Mouse       : Lihat");
             renderText(1050,670,GLUT_BITMAP_8_BY_13,"Left-Click  : Tembak");
+            renderText(1050,625,GLUT_BITMAP_8_BY_13,"=/-         : Zoom-In/Out");
             renderText(1050,655,GLUT_BITMAP_8_BY_13,"1/2/3/4     : Proyeksi");
             renderText(1050,640,GLUT_BITMAP_8_BY_13,"ESC         : Keluar");
 
@@ -530,8 +532,14 @@ void display() {
             else                        glColor3f(1,0,0);
             renderText(bx, by-25, GLUT_BITMAP_9_BY_15, healthText);
 
+            glColor3f(1.0f, 1.0f, 1.0f);
+            char zoomCam[50];
+            sprintf(zoomCam, "Zoom Percentage: %0.1f%%", camDist);
+            renderText(bx, by-50, GLUT_BITMAP_9_BY_15, zoomCam);
+
             if (isDead) {
                 glColor3f(1,1,1);
+                glLineWidth(5.0f);
                 renderText(580, 360, GLUT_BITMAP_9_BY_15, "Game Over");
             }
 
@@ -553,7 +561,7 @@ void applyProjection() {
     if (viewMode == 4) {
         // Orthographic: Objek tidak mengecil saat jauh.
         // Ganti angka 6.0 dengan variabel 'zoom' jika ingin bisa zoom in/out
-        glOrtho(-orthoZoom * aspect, orthoZoom * aspect, -orthoZoom, orthoZoom, 0.1, 1000.0);
+        glOrtho(-camDist * aspect, camDist * aspect, -camDist, camDist, 0.1, 1000.0);
     } else {
         // Perspective: Mode 1, 2, 3
         gluPerspective(45.0, aspect, 0.01, 200.0);
@@ -576,24 +584,22 @@ void updateMovement() {
     if (keys['a']) { posX-=rightX*speed; posZ-=rightZ*speed; }
     if (keys['d']) { posX+=rightX*speed; posZ+=rightZ*speed; }
 
-    int prevMode = viewMode;
+    int pastMode = viewMode;
+    float pastDist = camDist;
     if (keys['1']) viewMode = 1;
     if (keys['2']) viewMode = 2;
     if (keys['3']) viewMode = 3;
     if (keys['4']) viewMode = 4;
-    if (keys['+']) {
-        orthoZoom -= 0.1f;
+    if (keys['='] && camDist > 1.1f && (viewMode != 1)) {
         camDist -= 0.1f;
-        applyProjection();
     }
-    if (keys['-']) {
-        orthoZoom += 0.1f;
+    if (keys['-'] && camDist < 7.0f && viewMode != 1) {
         camDist += 0.1f;
+    }
+
+    if (pastMode != viewMode || pastDist != camDist) {
         applyProjection();
     }
-    if (viewMode != prevMode) {
-        applyProjection();
-    };
 }
 
 // ===================== TIMER ===================== //
