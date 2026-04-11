@@ -341,13 +341,9 @@ void init() {
     GLfloat spec[] = {0.8f, 0.8f, 0.8f, 1.0f};
     glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
     glClearColor(0.53f, 0.81f, 0.98f, 1.0f);
+
+    // MSAA
     glEnable(GLUT_MULTISAMPLE);
-    glEnable(GL_LINE_SMOOTH);
-    glEnable(GL_POLYGON_SMOOTH);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 // ===================== DISPLAY ===================== //
@@ -651,7 +647,10 @@ int main(int argc, char** argv) {
     glutCreateWindow("Blocky Zombie FPS");
     glutWarpPointer(500, 350);
     init();
-    rightShoulder=-90; leftShoulder=-90;
+
+    rightShoulder=-90;
+    leftShoulder=-90;
+
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
