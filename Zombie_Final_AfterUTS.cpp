@@ -29,11 +29,11 @@
 bool keys[256] = {false};
 
 /* === VARIABEL KAMERA === */
-int viewMode = 1;
-float recoil = 0.0f;
+int viewMode    = 1;
+float recoil    = 0.0f;
 float camAngleX = 0.0f;
 float camAngleY = 0.0f;
-float camDist = 3.0f;
+float camDist   = 3.0f;
 float eyeOffset = 0.13f;
 bool isShooting = false;
 
@@ -66,22 +66,25 @@ float zomAngleY    = 0.0f;
 float stopDistance = 0.5f;
 
 /* === POSISI MATAHARI === */
-float sunX =   0.0f;
-float sunY =  15.0f;
+float sunX = 0.0f;
+float sunY = 15.0f;
 float sunZ = -30.0f;
 
 /* === WINDOW SIZE === */
 int winWidth  = 1280;
-int winHeight =  720;
+int winHeight = 720;
 
 // ===================== MATERIAL ===================== //
 void setMaterial(float r, float g, float b) {
+    /* === KAMUS LOKAL === */
     GLfloat mat_ambient[] = {r * 0.3f, g * 0.3f, b * 0.3f, 1.0f};
     GLfloat mat_diffuse[] = {r, g, b, 1.0f};
     GLfloat mat_specular[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+
+    /* === ALGORITMA === */
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     glMaterialf (GL_FRONT, GL_SHININESS, 50.0f);
 }
 
@@ -91,7 +94,12 @@ void drawCuboid(float w, float h, float d,
                 float sR, float sG, float sB,
                 float tR, float tG, float tB,
                 float bR, float bG, float bB) {
-    float x = w*0.5f, y = h*0.5f, z = d*0.5f;
+    /* === KAMUS LOKAL === */
+    float x = w * 0.5f;
+    float y = h * 0.5f;
+    float z = d * 0.5f;
+
+    /* === ALGORITMA === */
     glBegin(GL_QUADS);
         glNormal3f(0,0,1);  glColor3f(fR,fG,fB);
         glVertex3f(-x,-y,z); glVertex3f(x,-y,z); glVertex3f(x,y,z); glVertex3f(-x,y,z);
@@ -109,7 +117,12 @@ void drawCuboid(float w, float h, float d,
 }
 
 void drawCuboid(float w, float h, float d) {
-    float x = w*0.5f, y = h*0.5f, z = d*0.5f;
+    /* === KAMUS LOKAL === */
+    float x = w * 0.5f;
+    float y = h * 0.5f;
+    float z = d * 0.5f;
+
+    /* === ALGORITMA === */
     glBegin(GL_QUADS);
         glNormal3f(0,0,1);  glVertex3f(-x,-y,z); glVertex3f(x,-y,z); glVertex3f(x,y,z); glVertex3f(-x,y,z);
         glNormal3f(0,0,-1); glVertex3f(x,-y,-z); glVertex3f(-x,-y,-z); glVertex3f(-x,y,-z); glVertex3f(x,y,-z);
@@ -121,6 +134,9 @@ void drawCuboid(float w, float h, float d) {
 }
 
 void drawFrontPatch(float px, float py, float pw, float ph, float z, float r, float g, float b) {
+    /* === KAMUS LOKAL === */
+
+    /* === ALGORITMA === */
     glColor3f(r,g,b);
     glBegin(GL_QUADS);
         glNormal3f(0,0,1);
@@ -131,7 +147,13 @@ void drawFrontPatch(float px, float py, float pw, float ph, float z, float r, fl
 
 // ===================== BAGIAN ZOMBIE ===================== //
 void drawHeadZombie() {
-    float w=0.5f, h=0.45f, d=0.5f, z=d*0.5f+0.001f;
+    /* === KAMUS LOKAL === */
+    float w = 0.5f;
+    float h = 0.45f;
+    float d = 0.5f;
+    float z = d * 0.5f + 0.001f;
+
+    /* === ALGORITMA === */
     drawCuboid(w,h,d, 0.34f,0.52f,0.24f, 0.38f,0.56f,0.28f, 0.40f,0.58f,0.30f, 0.28f,0.42f,0.20f);
     drawFrontPatch(-0.17f,-0.01f,0.12f,0.07f,z, 0.05f,0.05f,0.05f);
     drawFrontPatch( 0.06f,-0.01f,0.12f,0.07f,z, 0.05f,0.05f,0.05f);
@@ -140,26 +162,44 @@ void drawHeadZombie() {
 }
 
 void drawBodyZombie() {
-    float w=0.5f, h=0.67f, d=0.25f, z=d*0.5f+0.001f;
+    /* === KAMUS LOKAL === */
+    float w = 0.5f;
+    float h = 0.67f;
+    float d = 0.25f;
+    float z = d * 0.5f + 0.001f;
+
+    /* === ALGORITMA === */
     drawCuboid(w,h,d, 0.08f,0.78f,0.82f, 0.06f,0.68f,0.72f, 0.12f,0.82f,0.86f, 0.05f,0.55f,0.60f);
     drawFrontPatch(-0.1f, 0.27f,0.2f, 0.06f,z, 0.30f,0.32f,0.12f);
     drawFrontPatch(-0.05f,0.21f,0.1f, 0.06f,z, 0.30f,0.32f,0.12f);
 }
 
 void drawArmZombie() {
-    float w=0.25f, h=0.65f, d=0.25f, sleeveH=0.20f, armH=h-sleeveH;
+    /* === KAMUS LOKAL === */
+    float w = 2.5f;
+    float h = 0.65f;
+    float d = 0.25f;
+    float sleeveH = 0.20f;
+    float armH = h - sleeveH;
+
+    /* === ALGORITMA === */
     glPushMatrix();
-        glTranslatef(0,(h-sleeveH)*0.5f,0);
+        glTranslatef(0,(h - sleeveH) * 0.5f,0);
         drawCuboid(w,sleeveH,d, 0.08f,0.78f,0.82f, 0.06f,0.68f,0.72f, 0.12f,0.82f,0.86f, 0.05f,0.55f,0.60f);
     glPopMatrix();
     glPushMatrix();
-        glTranslatef(0,-(sleeveH*0.5f),0);
+        glTranslatef(0,-(sleeveH * 0.5f),0);
         drawCuboid(w,armH,d, 0.46f,0.60f,0.35f, 0.42f,0.56f,0.32f, 0.48f,0.62f,0.37f, 0.38f,0.50f,0.28f);
     glPopMatrix();
 }
 
 void drawLegZombie() {
-    float w=0.25f, h=0.7f, d=0.18f;
+    /* === KAMUS LOKAL === */
+    float w = 0.25f;
+    float h = 0.7f;
+    float d = 0.18f;
+
+    /* === ALGORITMA === */
     glPushMatrix();
         glTranslatef(0,0.05f,0);
         drawCuboid(w,h,d, 0.34f,0.27f,0.78f, 0.30f,0.24f,0.70f, 0.37f,0.30f,0.82f, 0.30f,0.24f,0.70f);
@@ -171,38 +211,73 @@ void drawLegZombie() {
 }
 
 void drawBucketHat() {
-    GLUquadric* q = gluNewQuadric();
+    /* === KAMUS LOKAL === */
+    GLUquadric* q;
+
+    /* === ALGORITMA === */
+    q = gluNewQuadric();
     gluQuadricNormals(q, GLU_SMOOTH);
     setMaterial(0.85f,0.85f,0.85f);
-    glPushMatrix(); gluCylinder(q,0.22f,0.20f,0.22f,24,4);
-        glPushMatrix(); glTranslatef(0,0,0.22f); gluDisk(q,0,0.22f,24,1); glPopMatrix();
+    glPushMatrix();
+        gluCylinder(q,0.22f,0.20f,0.22f,24,4);
+        glPushMatrix(); 
+            glTranslatef(0,0,0.22f);
+            gluDisk(q,0,0.22f,24,1);
+        glPopMatrix();
     glPopMatrix();
-    glPushMatrix(); gluDisk(q,0.20f,0.34f,24,1); glPopMatrix();
-    glPushMatrix(); glTranslatef(0,0,-0.02f); gluDisk(q,0.18f,0.32f,24,1); glPopMatrix();
-    glPushMatrix(); glTranslatef(0,0,-0.02f); gluCylinder(q,0.32f,0.34f,0.02f,24,1); glPopMatrix();
+    glPushMatrix();
+        gluDisk(q,0.20f,0.34f,24,1);
+    glPopMatrix();
+    glPushMatrix();
+        glTranslatef(0,0,-0.02f);
+        gluDisk(q,0.18f,0.32f,24,1);
+    glPopMatrix();
+    glPushMatrix();
+        glTranslatef(0,0,-0.02f);
+        gluCylinder(q,0.32f,0.34f,0.02f,24,1);
+    glPopMatrix();
     gluDeleteQuadric(q);
 }
 
 void drawZombie() {
+    /* === KAMUS LOKAL === */
+
+    /* === ALGORITMA === */
     glPushMatrix();
         glPushMatrix();
-            glTranslatef(0,0.3f,0); glRotatef((GLfloat)head,0,0,1);
-            glTranslatef(0,0.3f,0); glScalef(0.9f,0.9f,0.9f);
-            glShadeModel(GL_FLAT); drawHeadZombie();
+            glTranslatef(0,0.3f,0);
+            glRotatef((GLfloat)head,0,0,1);
+            glTranslatef(0,0.3f,0);
+            glScalef(0.9f,0.9f,0.9f);
+            glShadeModel(GL_FLAT);
+            drawHeadZombie();
             glPushMatrix();
                 glTranslatef(0,0.25f,0); glRotatef(-90,1,0,0);
                 glShadeModel(GL_SMOOTH); drawBucketHat(); glShadeModel(GL_FLAT);
             glPopMatrix();
         glPopMatrix();
-        glPushMatrix(); glTranslatef(0,0.07f,0); drawBodyZombie(); glPopMatrix();
+        glPushMatrix();
+            glTranslatef(0,0.07f,0);
+            drawBodyZombie();
+        glPopMatrix();
         glPushMatrix(); glTranslatef(0.36f,0.32f,-0.1f);
-            glRotatef((GLfloat)rightShoulder,1,0,0); glTranslatef(0,-0.32f,0); drawArmZombie();
+            glRotatef((GLfloat)rightShoulder,1,0,0);
+            glTranslatef(0,-0.32f,0);
+            drawArmZombie();
         glPopMatrix();
         glPushMatrix(); glTranslatef(-0.36f,0.32f,-0.1f);
-            glRotatef((GLfloat)leftShoulder,1,0,0); glTranslatef(0,-0.32f,0); drawArmZombie();
+            glRotatef((GLfloat)leftShoulder,1,0,0);
+            glTranslatef(0,-0.32f,0);
+            drawArmZombie();
         glPopMatrix();
-        glPushMatrix(); glTranslatef( 0.125f,-0.65f,0); drawLegZombie(); glPopMatrix();
-        glPushMatrix(); glTranslatef(-0.125f,-0.65f,0); drawLegZombie(); glPopMatrix();
+        glPushMatrix();
+            glTranslatef( 0.125f,-0.65f,0);
+            drawLegZombie();
+        glPopMatrix();
+            glPushMatrix();
+            glTranslatef(-0.125f,-0.65f,0);
+            drawLegZombie();
+        glPopMatrix();
     glPopMatrix();
 }
 
@@ -233,11 +308,15 @@ void drawHandHUD(float xPos, float rotation, float currentRecoil) {
     glPushMatrix();
         glLoadIdentity(); // lepas dari kamera dunia, kunci ke layar
         glTranslatef(xPos, -0.6f + currentRecoil, -1.5f);
-        glRotatef(-1,1,0,0); glRotatef(rotation,0,1,0);
-        setMaterial(0.8f,0.6f,0.4f); drawCuboid(0.3f,0.3f,0.8f);
+        glRotatef(-1,1,0,0);
+        glRotatef(rotation,0,1,0);
+        setMaterial(0.8f,0.6f,0.4f);
+        drawCuboid(0.3f,0.3f,0.8f);
         if (xPos > 0.0f) {
             glPushMatrix();
-                glTranslatef(0,0.15f,-0.35f); glRotatef(1,1,0,0); drawPistol();
+                glTranslatef(0,0.15f,-0.35f);
+                glRotatef(1,1,0,0);
+                drawPistol();
             glPopMatrix();
         }
     glPopMatrix();
@@ -354,7 +433,9 @@ void zombieAttack() {
     int currentTime;
 
     /* === ALGORITMA === */
-    dx = posX-zomX; dy = posY-zomY; dz = posZ-zomZ;
+    dx = posX-zomX;
+    dy = posY-zomY;
+    dz = posZ-zomZ;
     dist = sqrt(dx*dx + dy*dy + dz*dz);
     currentTime = glutGet(GLUT_ELAPSED_TIME);
     if (!isDead) {
@@ -687,10 +768,10 @@ void updateMovement() {
 
     /* === ALGORITMA === */
     rad    = camAngleY * M_PI / 180.0f;
-    fwdX   =  sin(rad);
+    fwdX   = sin(rad);
     fwdZ   = -cos(rad);
-    rightX =  cos(rad);
-    rightZ =  sin(rad);
+    rightX = cos(rad);
+    rightZ = sin(rad);
     speed  = 0.02f;
 
     if (keys['w']) { posX += fwdX  * speed; posZ += fwdZ  * speed; }
@@ -730,7 +811,8 @@ void timer(int v) {
 void mouseMove(int x, int y) {
     /* === KAMUS LOKAL === */
     int cx, cy, dx, dy;
-    static int lastX = 500, lastY = 350;
+    static int lastX = 500;
+    static int lastY = 350;
     static bool first = true;
 
     /* === ALGORITMA === */
@@ -740,7 +822,9 @@ void mouseMove(int x, int y) {
     camAngleY += dx*0.2f; camAngleX += dy*0.2f;
     if (camAngleX >  85) camAngleX =  85;
     if (camAngleX < -85) camAngleX = -85;
-    if (x<100||x>900||y<100||y>600) { lastX=cx; lastY=cy; glutWarpPointer(cx,cy); }
+    if (x < 100||x > 900||y < 100||y > 600) {
+        lastX=cx; lastY=cy; glutWarpPointer(cx,cy);
+    }
 }
 
 void mouseClick(int b, int s, int x, int y) {
@@ -780,7 +864,10 @@ int main(int argc, char** argv) {
     glutCreateWindow("Blocky Zombie FPS");
     glutWarpPointer(500, 350);
     init();
-    rightShoulder = -90; leftShoulder = -90;
+
+    rightShoulder = -90;
+    leftShoulder = -90;
+
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
