@@ -370,6 +370,40 @@ void zombieAttack() {
     }
 }
 
+void updateZombie() {
+    /* === KAMUS LOKAL === */
+    float dx, dz;
+    float dist;
+    float desiredX, desiredZ;
+
+    /* === ALGORITMA === */
+    if (isDead) {
+        return;
+    }
+
+    // Arah dari zombie ke player (cukup bidang XZ)
+    dx = posX - zomX;
+    dz = posZ - zomZ;
+    dist = sqrt(dx * dx + dz * dz);
+
+    // Kalau sudah sangat dekat, berhenti
+    if (dist <= stopDistance) {
+        return;
+    }
+
+    // Normalisasi arah
+    desiredX = dx / dist;
+    desiredZ = dz / dist;
+
+    // Gerakkan zombie ke arah player
+    zomX += desiredX * zomSpeed;
+    zomZ += desiredZ * zomSpeed;
+
+    // Rotasi zombie agar menghadap player
+    zomAngleY = atan2(-dx, -dz) * 180.0f / M_PI;
+}
+
+
 // ===================== PROJECTION HELPER ===================== //
 void applyProjection() {
     /* === KAMUS LOKAL === */
@@ -684,6 +718,7 @@ void timer(int v) {
 
     /* === ALGORITMA === */
     updateMovement();
+    updateZombie();
     zombieAttack();
     if (isShooting) { recoil -= 0.05f; if (recoil < -0.3f) recoil = 0; }
     else recoil = 0;
