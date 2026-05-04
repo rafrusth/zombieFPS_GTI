@@ -165,7 +165,7 @@ void drawBodyZombie() {
     /* === KAMUS LOKAL === */
     float w = 0.5f;
     float h = 0.67f;
-    float d = 0.25f;
+    float d = 0.2f;
     float z = d * 0.5f + 0.001f;
 
     /* === ALGORITMA === */
@@ -176,7 +176,7 @@ void drawBodyZombie() {
 
 void drawArmZombie() {
     /* === KAMUS LOKAL === */
-    float w = 2.5f;
+    float w = 0.25f;
     float h = 0.65f;
     float d = 0.25f;
     float sleeveH = 0.20f;
@@ -298,15 +298,13 @@ void drawPistol() {
     glPopMatrix();
 }
 
-// ===================== HAND HUD (mode 1 FPS saja) ===================== //
-// Tangan dan pistol dikunci ke layar menggunakan glLoadIdentity()
-// agar tidak ikut transformasi kamera dunia
+// ===================== HAND HUD ===================== //
 void drawHandHUD(float xPos, float rotation, float currentRecoil) {
     /* === KAMUS LOKAL === */
 
     /* === ALGORITMA === */
     glPushMatrix();
-        glLoadIdentity(); // lepas dari kamera dunia, kunci ke layar
+        glLoadIdentity(); 
         glTranslatef(xPos, -0.6f + currentRecoil, -1.5f);
         glRotatef(-1,1,0,0);
         glRotatef(rotation,0,1,0);
@@ -322,9 +320,7 @@ void drawHandHUD(float xPos, float rotation, float currentRecoil) {
     glPopMatrix();
 }
 
-// ===================== BODY PLAYER + PISTOL WORLD (mode 2, 3, 4) ===================== //
-// Digambar dalam koordinat dunia (bukan HUD), sehingga terlihat dari kamera third-person.
-// Pistol diletakkan di posisi tangan kanan player dalam koordinat lokal model player.
+// ===================== BODY PLAYER + PISTOL ===================== //
 void drawPlayer(float size) {
     /* === KAMUS LOKAL === */
     float rad;
@@ -333,7 +329,7 @@ void drawPlayer(float size) {
     glPushMatrix();
         glTranslatef(posX, posY, posZ);
         glScalef(size, size, size);
-        glRotatef(camAngleY, 0, 1, 0); // player menghadap arah pandang
+        glRotatef(camAngleY, 0, 1, 0); 
 
         // Badan
         glPushMatrix();
@@ -405,21 +401,12 @@ void drawPlayer(float size) {
 
             // Pistol di ujung tangan kanan
             glPushMatrix();
-                // Sedikit digeser di sumbu Z lokal agar gagangnya pas digenggam
-                glTranslatef(0.0f, -0.35f, 0.08f);
-                
-                // Rotasi pistol agar laras menunjuk ke depan (-Z dunia)
+                glTranslatef(0.0f, -0.35f, 0.08f);                
                 glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
                 glScalef(0.8f, 0.8f, 0.8f);
-                
-                // 4. KOREKSI WARNA: Matikan pewarnaan vertex bawaan (warna kulit)
-                glDisable(GL_COLOR_MATERIAL);
-                
-                // Paksa material warna abu-abu gelap seperti mode 1
+                glDisable(GL_COLOR_MATERIAL);    
                 setMaterial(0.15f, 0.15f, 0.15f); 
                 drawPistol();
-                
-                // Nyalakan kembali untuk merender objek lain setelah ini
                 glEnable(GL_COLOR_MATERIAL);
             glPopMatrix();
         glPopMatrix();
@@ -462,12 +449,10 @@ void updateZombie() {
         return;
     }
 
-    // Arah dari zombie ke player (cukup bidang XZ)
     dx = posX - zomX;
     dz = posZ - zomZ;
     dist = sqrt(dx * dx + dz * dz);
 
-    // Kalau sudah sangat dekat, berhenti
     if (dist <= stopDistance) {
         return;
     }
@@ -496,10 +481,8 @@ void applyProjection() {
     glLoadIdentity();
 
     if (viewMode == 4) {
-        // ORTHOGRAPHIC: tidak ada vanishing point, ukuran objek seragam
         glOrtho(-camDist * aspect, camDist * aspect, -camDist, camDist, 0.1, 1000.0);
     } else {
-        // PERSPECTIVE: mode 1, 2, 3
         gluPerspective(45.0, aspect, 0.01, 200.0);
     }
     glMatrixMode(GL_MODELVIEW);
@@ -548,36 +531,14 @@ void display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // -------------------------------------------------------
-    // SETUP KAMERA berdasarkan viewMode
-    //
-    // Mode 1 - 1-Point Perspective (FPS):
-    //   Satu titik hilang ke depan. Sudut pandang orang pertama.
-    //   Tangan + pistol digambar sebagai HUD (glLoadIdentity).
-    //
-    // Mode 2 - 2-Point Perspective (Third Person Samping):
-    //   Kamera dari samping-belakang pemain. Dua titik hilang
-    //   di kiri & kanan horizon. Body + pistol player terlihat
-    //   dalam koordinat dunia.
-    //
-    // Mode 3 - 3-Point Perspective (Third Person Atas):
-    //   Kamera dari atas-belakang pemain. Tiga titik hilang.
-    //   Body + pistol player terlihat dari sudut tinggi.
-    //
-    // Mode 4 - Orthographic:
-    //   Tidak ada vanishing point. Objek jauh & dekat sama besar.
-    //   Body + pistol player terlihat, kamera mengikuti pemain.
-    // -------------------------------------------------------
     switch(viewMode) {
         case 1:
-            // FPS: rotasi di titik asal lalu geser ke posisi pemain
             glRotatef(camAngleX, 1, 0, 0);
             glRotatef(camAngleY, 0, 1, 0);
             glTranslatef(-posX, -(posY + eyeOffset), -posZ);
             break;
 
         case 2: {
-            // Third person samping: kamera di belakang & sejajar tinggi pemain
             float rad = camAngleY * M_PI / 180.0f;
             float eyeX = posX - sin(rad) * camDist;
             float eyeY = posY;
@@ -587,7 +548,6 @@ void display() {
         }
 
         case 3: {
-            // Third person atas: kamera di belakang + agak atas
             float rad = camAngleY * M_PI / 180.0f;
             float eyeX = posX - sin(rad) * camDist;
             float eyeY = posY + camDist;
@@ -597,7 +557,6 @@ void display() {
         }
 
         case 4: {
-            // Orthographic: kamera atas-belakang mengikuti pemain
             float rad = camAngleY * M_PI / 180.0f;
             float dist4 = 10.0f;
             float eyeX = posX - sin(rad) * dist4;
@@ -638,26 +597,11 @@ void display() {
         drawZombie();
     glPopMatrix();
 
-    // -------------------------------------------------------
-    // RENDER PLAYER & PISTOL
-    //
-    // Mode 1 (FPS):
-    //   Pistol + tangan digambar sebagai HUD menggunakan
-    //   drawHandHUD() yang pakai glLoadIdentity() agar nempel
-    //   di layar, tidak terpengaruh rotasi kamera dunia.
-    //
-    // Mode 2, 3, 4 (Third Person / Ortho):
-    //   Body player + pistol digambar di koordinat DUNIA
-    //   menggunakan drawPlayer(). Pistol ada di tangan kanan
-    //   model player sehingga terlihat dari kamera third-person.
-    // -------------------------------------------------------
     if (viewMode == 1) {
-        // HUD tangan + pistol (dikunci ke layar)
         glClear(GL_DEPTH_BUFFER_BIT);
         glDisable(GL_COLOR_MATERIAL);
         drawHandHUD(0.7f, 15.0f, recoil);
     } else {
-        // Body player + pistol di dunia 3D
         glEnable(GL_COLOR_MATERIAL);
         glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
         drawPlayer(0.5f);
@@ -767,12 +711,12 @@ void updateMovement() {
     float pastDist;
 
     /* === ALGORITMA === */
-    rad    = camAngleY * M_PI / 180.0f;
-    fwdX   = sin(rad);
-    fwdZ   = -cos(rad);
+    rad = camAngleY * M_PI / 180.0f;
+    fwdX = sin(rad);
+    fwdZ = -cos(rad);
     rightX = cos(rad);
     rightZ = sin(rad);
-    speed  = 0.02f;
+    speed = 0.02f;
 
     if (keys['w']) { posX += fwdX  * speed; posZ += fwdZ  * speed; }
     if (keys['s']) { posX -= fwdX  * speed; posZ -= fwdZ  * speed; }
@@ -851,14 +795,14 @@ void reshape(int width, int height) {
 int main(int argc, char** argv) {
     /* === KAMUS === */
     int screenWidth, screenHeight;
-    int windowWidth  = 1280;
+    int windowWidth = 1280;
     int windowHeight = 720;
 
     /* === ALGORITMA === */
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
     glutInitWindowSize(windowWidth, windowHeight);
-    screenWidth  = glutGet(GLUT_SCREEN_WIDTH);
+    screenWidth = glutGet(GLUT_SCREEN_WIDTH);
     screenHeight = glutGet(GLUT_SCREEN_HEIGHT);
     glutInitWindowPosition((screenWidth-windowWidth)/2, (screenHeight-windowHeight)/2);
     glutCreateWindow("Blocky Zombie FPS");
