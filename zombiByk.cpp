@@ -27,6 +27,14 @@
 #include <ctime>   
 #include <cstdlib> 
 
+// ===================== ABSTRACT DATA TYPES ===================== //
+// Fisika kolision (Kotak based)
+struct AABB {
+    float minX, maxX;
+    float minY, maxY;
+    float minZ, maxZ;
+};
+
 // ===================== KAMUS GLOBAL ===================== //
 bool keys[256] = {false};
 
@@ -52,6 +60,24 @@ bool isDead = false;
 int lastDamageTime = 0;
 int damageDelay = 1000;
 
+/* === POSISI OBSTACLE === */
+// Meja
+int numTables;
+const int LIMIT_TABLES = 20;
+float tableX[LIMIT_TABLES];
+float tableZ[LIMIT_TABLES];
+float tableY;
+
+// Ukuran meja
+float tableW = 0.5f;
+float tableH = 0.08f; 
+float tableD = 1.0f;
+
+// Ukuran kaki meja
+float tableFootW = 0.1f;
+float tableFootH = 0.48f; 
+float tableFootD = 0.1f;
+
 /* === POSISI ZOMBIE === */
 int numZombies;                 
 const int LIMIT_ZOMBIES = 20;
@@ -62,12 +88,12 @@ float zomY = -0.52f;
 /* === POSE ZOMBIE === */
 static int head = 0;
 static int rightShoulder = -90;
-static int leftShoulder  = -90;
+static int leftShoulder = -90;
 
 /* === GERAK & ARAH ZOMBIE === */
-float zomSpeed     = 0.01f;
+float zomSpeed = 0.05f;
 float zomAngleY[LIMIT_ZOMBIES];
-float stopDistance = 0.5f;
+float stopDistance = 0.4f;
 
 /* === POSISI MATAHARI === */
 float sunX = 0.0f;
@@ -77,6 +103,58 @@ float sunZ = -30.0f;
 /* === WINDOW SIZE === */
 int winWidth  = 1280;
 int winHeight = 720;
+
+// ===================== AABB ===================== //
+bool checkAABB(const AABB& a, const AABB& b) {
+    /* === KAMUS LOKAL === */
+
+    /* === ALGORITMA === */
+    return  (a.minX <= b.maxX && a.maxX >= b.minX) &&
+            (a.minY <= b.maxY && a.maxY >= b.minY) &&
+            (a.minZ <= b.maxZ && a.maxZ >= b.minZ);
+}
+
+AABB getPlayerAABB() {
+    /* === KAMUS LOKAL === */
+    AABB box;
+
+    /* === ALGORITMA === */
+    box.minX = posX - 0.25f;
+    box.maxX = posX + 0.25f;
+    box.minY = posY;
+    box.maxY = posY + 0.9f;
+    box.minZ = posZ - 0.25f;
+    box.maxZ = posZ + 0.25f;
+    return box;
+}
+
+AABB getTableAABB(int i) {
+    /* === KAMUS LOKAL === */
+    AABB box;
+
+    /* === ALGORITMA === */
+    box.minX = tableX[i] - tableW * 0.45f;
+    box.maxX = tableX[i] + tableW * 0.45f;
+    box.minY = tableY;
+    box.maxY = tableY + tableH;
+    box.minZ = tableZ[i] - tableD * 0.45f;
+    box.maxZ = tableZ[i] + tableD * 0.45f;
+    return box;
+}
+
+AABB getZombieAABB(int i) {
+    /* === KAMUS LOKAL === */
+    AABB box;
+
+    /* === ALGORITMA === */
+    box.minX = zomX[i] - 0.25f;
+    box.maxX = zomX[i] + 0.25f;
+    box.minY = zomY;
+    box.maxY = zomY + 0.9f;
+    box.minZ = zomZ[i] - 0.25f;
+    box.maxZ = zomZ[i] + 0.25f;
+    return box;
+}
 
 // ===================== MATERIAL ===================== //
 void setMaterial(float r, float g, float b) {
@@ -149,7 +227,7 @@ void drawFrontPatch(float px, float py, float pw, float ph, float z, float r, fl
     glEnd();
 }
 
-// ===================== BAGIAN ZOMBIE ===================== //
+// ===================== ZOMBIE ===================== //
 void drawHeadZombie() {
     /* === KAMUS LOKAL === */
     float w = 0.5f;
@@ -281,6 +359,57 @@ void drawZombie() {
             glPushMatrix();
             glTranslatef(-0.125f,-0.65f,0);
             drawLegZombie();
+        glPopMatrix();
+    glPopMatrix();
+}
+
+// ===================== OBSTACLE ===================== //
+void drawTableFace() {
+	/* === KAMUS LOKAL === */
+	
+	/* === ALGORITMA=== */
+    setMaterial(0.15f,0.15f,0.15f);
+    drawCuboid(tableW, tableH, tableD);
+}
+
+void drawTableFoot() {
+	/* === KAMUS LOKAL === */
+	
+	/* === ALGORITMA=== */
+    setMaterial(0.15f,0.15f,0.15f);
+    drawCuboid(tableFootW, tableFootH, tableFootD);
+}
+
+void drawTable() {
+	/* === KAMUS LOKAL === */
+	
+	/* === ALGORITMA=== */
+	glPushMatrix();
+        glPushMatrix();
+            drawTableFace();
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(0.22f, -0.2f, 0.3f);
+            drawTableFoot();
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(-0.22f, -0.2f, -0.3f);
+
+            drawTableFoot();
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(-0.22f, -0.2f, 0.3f);
+
+            drawTableFoot();
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(0.22f, -0.2f, -0.3f);
+
+            drawTableFoot();
         glPopMatrix();
     glPopMatrix();
 }
@@ -420,24 +549,24 @@ void drawPlayer(float size) {
 
 void zombieAttack() {
     /* === KAMUS LOKAL === */
-    float dx, dy, dz, dist;
-    int currentTime;
+    float dx, dz, dist;
+    int currentTime, i;
 
     /* === ALGORITMA === */
     currentTime = glutGet(GLUT_ELAPSED_TIME);
 
     if (!isDead) {
+        AABB playerBox = getPlayerAABB();
         for (int i = 0; i < numZombies; i++) {
-            dx = posX - zomX[i];
-            dy = posY - zomY; 
-            dz = posZ - zomZ[i];
-            dist = sqrt(dx * dx + dy * dy + dz * dz);
-            if (dist <= stopDistance) {
+            AABB zombieBox = getZombieAABB(i);
+            if (checkAABB(playerBox, zombieBox)) {
                 if (currentTime - lastDamageTime > damageDelay) {
                     playerHealth -= 10;
                     lastDamageTime = currentTime;
-                    if (playerHealth <= 0) isDead = true;
-                    break; 
+                    if (playerHealth <= 0) {
+                        isDead = true;
+                        break; 
+                    }
                 }
             }
         }
@@ -459,9 +588,9 @@ void updateZombie(int i) {
 
     dx = posX - zomX[i];
     dz = posZ - zomZ[i];
-    dist = sqrt(dx * dx + dz * dz);
+    dist = dx * dx + dz * dz;
 
-    if (dist <= stopDistance) {
+    if (dist <= stopDistance * stopDistance) {
         return;
     }
     desiredx = dx / dist;
@@ -492,15 +621,23 @@ void applyProjection() {
 // ===================== INIT ===================== //
 void init() {
     /* === KAMUS LOKAL === */
+    int i;
 
     /* === ALGORITMA === */
     srand(time(NULL)); 
     numZombies = (rand() % 10) + 3; 
-    for (int i = 0; i < numZombies; i++) {
+    for (i = 0; i < numZombies; i++) {
         zomX[i] = (rand() % 40) - 20.0f;
         zomZ[i] = (rand() % 40) - 30.0f;
         zomAngleY[i] = 0.0f;
     }
+
+    numTables = (rand() % 10) + 3;
+    for (i = 0; i < numTables; i++) {
+        tableX[i] = (rand() % 40) - 10.0f;
+        tableZ[i] = (rand() % 40) - 20.0f;
+    }
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -533,6 +670,10 @@ void renderText(float x, float y, void* font, const char* string) {
 
 void display() {
     /* === KAMUS LOKAL === */
+    int i;
+    float rad;
+    float eyeX, eyeY, eyeZ;
+    float dist4;
 
     /* === ALGORITMA === */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -547,29 +688,29 @@ void display() {
             break;
 
         case 2: {
-            float rad = camAngleY * M_PI / 180.0f;
-            float eyeX = posX - sin(rad) * camDist;
-            float eyeY = posY;
-            float eyeZ = posZ + cos(rad) * camDist;
+            rad = camAngleY * M_PI / 180.0f;
+            eyeX = posX - sin(rad) * camDist;
+            eyeY = posY;
+            eyeZ = posZ + cos(rad) * camDist;
             gluLookAt(eyeX, eyeY, eyeZ, posX, posY, posZ, 0, 1, 0);
             break;
         }
 
         case 3: {
-            float rad = camAngleY * M_PI / 180.0f;
-            float eyeX = posX - sin(rad) * camDist;
-            float eyeY = posY + camDist;
-            float eyeZ = posZ + cos(rad) * camDist;
+            rad = camAngleY * M_PI / 180.0f;
+            eyeX = posX - sin(rad) * camDist;
+            eyeY = posY + camDist;
+            eyeZ = posZ + cos(rad) * camDist;
             gluLookAt(eyeX, eyeY, eyeZ, posX, posY, posZ, 0, 1, 0);
             break;
         }
 
         case 4: {
-            float rad = camAngleY * M_PI / 180.0f;
-            float dist4 = 10.0f;
-            float eyeX = posX - sin(rad) * dist4;
-            float eyeY = posY + 10.0f;
-            float eyeZ = posZ + cos(rad) * dist4;
+            rad = camAngleY * M_PI / 180.0f;
+            dist4 = 10.0f;
+            eyeX = posX - sin(rad) * dist4;
+            eyeY = posY + 10.0f;
+            eyeZ = posZ + cos(rad) * dist4;
             gluLookAt(eyeX, eyeY, eyeZ, posX, posY, posZ, 0, 1, 0);
             break;
         }
@@ -595,18 +736,27 @@ void display() {
         glVertex3f(100,-1,100);   glVertex3f(100,-1,-100);
     glEnd();
 
+    // Meja
+    glDisable(GL_COLOR_MATERIAL);
+    setMaterial(0.8f, 0.5f, 0.2f);
+    for (i = 0; i < numTables; i++) {
+        glPushMatrix();
+            glTranslatef(tableX[i], tableY - 0.5f, tableZ[i]);
+            drawTable();
+        glPopMatrix();
+    }
+
     // Zombie
-    
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	
-	for (int i = 0; i < numZombies; i++) {
-	    glPushMatrix();
-	        glTranslatef(zomX[i], zomY, zomZ[i]);
-	        glRotatef(zomAngleY[i] + 180.0f, 0, 1, 0);
-	        glScalef(0.5f, 0.5f, 0.5f);
-	        drawZombie(); 
-	    glPopMatrix();
+	for (i = 0; i < numZombies; i++) {
+        glPushMatrix();
+            glTranslatef(zomX[i], zomY, zomZ[i]);
+            glRotatef(zomAngleY[i] + 180.0f, 0, 1, 0);
+            glScalef(0.5f, 0.5f, 0.5f);
+            drawZombie(); 
+        glPopMatrix();
 	}
 
     if (viewMode == 1) {
@@ -721,6 +871,8 @@ void updateMovement() {
     float rad, fwdX, fwdZ, rightX, rightZ, speed;
     int pastMode;
     float pastDist;
+    float overlapX, overlapZ;
+    int t, z;
 
     /* === ALGORITMA === */
     rad = camAngleY * M_PI / 180.0f;
@@ -729,6 +881,34 @@ void updateMovement() {
     rightX = cos(rad);
     rightZ = sin(rad);
     speed = 0.02f;
+
+    AABB playerBox = getPlayerAABB();
+    for (t = 0; t < numTables; t++) {
+        AABB table = getTableAABB(t);
+        if (checkAABB(playerBox, table)) {
+            overlapX = std::min(playerBox.maxX - table.minX, table.maxX - playerBox.minX);
+            overlapZ = std::min(playerBox.maxZ - table.minZ, table.maxZ - playerBox.minZ);
+            if (overlapX < overlapZ)
+                posX += (posX < tableX[t]) ? -overlapX : overlapX;
+            else
+                posZ += (posZ < tableZ[t]) ? -overlapZ : overlapZ;
+        }
+    }
+
+    for (z = 0; z < numZombies; z++) {
+        AABB zombieBox = getZombieAABB(z);
+        for (t = 0; t < numTables; t++) {
+            AABB table = getTableAABB(t);
+            if (checkAABB(zombieBox, table)) {
+                overlapX = std::min(zombieBox.maxX - table.minX, table.maxX - zombieBox.minX);
+                overlapZ = std::min(zombieBox.maxZ - table.minZ, table.maxZ - zombieBox.minZ);
+                if (overlapX < overlapZ)
+                    zomX[z] += (zomX[z] < tableX[t]) ? -overlapX : overlapX;
+                else
+                    zomZ[z] += (zomZ[z] < tableZ[t]) ? -overlapZ : overlapZ;
+            }
+    }
+}    
 
     if (keys['w']) { posX += fwdX  * speed; posZ += fwdZ  * speed; }
     if (keys['s']) { posX -= fwdX  * speed; posZ -= fwdZ  * speed; }
@@ -754,13 +934,20 @@ void timer(int v) {
     /* === KAMUS LOKAL === */
 
     /* === ALGORITMA === */
-   updateMovement();
+    updateMovement();
     for (int i = 0; i < numZombies; i++) {
         updateZombie(i); 
     }
     zombieAttack();
-    if (isShooting) { recoil -= 0.05f; if (recoil < -0.3f) recoil = 0; }
-    else recoil = 0;
+    if (isShooting) {
+        recoil -= 0.05f;
+        if (recoil < -0.3f) {
+            recoil = 0;
+        }
+    }
+    else {
+        recoil = 0;
+    }
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);
 }
@@ -774,14 +961,26 @@ void mouseMove(int x, int y) {
     static bool first = true;
 
     /* === ALGORITMA === */
-    cx = 500; cy = 350;
-    if (first) { lastX = x; lastY = y; first = false; return; }
-    dx = x-lastX; dy = y-lastY; lastX = x; lastY = y;
-    camAngleY += dx*0.2f; camAngleX += dy*0.2f;
+    cx = 500;
+    cy = 350;
+    if (first) {
+        lastX = x; lastY = y; first = false;
+        return; 
+    }
+    dx = x-lastX;
+    dy = y-lastY;
+    lastX = x;
+    lastY = y;
+
+    camAngleY += dx * 0.2f;
+    camAngleX += dy * 0.2f;
     if (camAngleX >  85) camAngleX =  85;
     if (camAngleX < -85) camAngleX = -85;
-    if (x < 100||x > 900||y < 100||y > 600) {
-        lastX=cx; lastY=cy; glutWarpPointer(cx,cy);
+
+    if (x < 100 || x > 900 || y < 100 || y > 600) {
+        lastX=cx;
+        lastY=cy;
+        glutWarpPointer(cx,cy);
     }
 }
 
