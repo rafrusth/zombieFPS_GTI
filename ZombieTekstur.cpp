@@ -1,4 +1,4 @@
-/*  Nama File   :   BlockyZombieFPS.cpp
+/*  Nama File   :   ZombieVerse.cpp
     Matakuliah  :   Grafik dan Teknik Interaktif 
     Kelompok    :   6
     Anggota     :   Rafif Setya Imaduddin  24060124130115
@@ -32,24 +32,38 @@
 #include <cstring> 
 
 // ===================== ABSTRACT DATA TYPES ===================== //
-// Fisika kolision (Kotak based)
+// Boundary Box
 struct AABB {
     float minX, maxX;
     float minY, maxY;
     float minZ, maxZ;
 };
 
+// Pohon
+struct Pohon {
+    float posX, posY, posZ;
+    float sizeW, sizeH, sizeD;
+};
+
+// Path 
+struct PathNode {
+    int x;
+    int z;
+};
+
 // ===================== KAMUS GLOBAL ===================== //
 bool keys[256] = {false};
 
 /* === VARIABEL KAMERA === */
-int viewMode    = 1;
-float recoil    = 0.0f;
+int viewMode = 1;
+float recoil = 0.0f;
 float camAngleX = 0.0f;
 float camAngleY = 0.0f;
-float camDist   = 3.0f;
+float camDist = 3.0f;
 float eyeOffset = 0.13f;
 bool isShooting = false;
+
+/* === TEXTURE === */
 GLuint textureFloor;
 GLuint textureTable;
 GLuint textureZombie;
@@ -67,7 +81,7 @@ bool isDead = false;
 int lastDamageTime = 0;
 int damageDelay = 1000;
 
-/* === POSISI OBSTACLE === */
+/* === POSISI OBJEK === */
 // Meja
 int numTables;
 const int LIMIT_TABLES = 20;
@@ -85,11 +99,6 @@ float tableFootW = 0.1f;
 float tableFootH = 0.48f; 
 float tableFootD = 0.1f;
 
-/* === POSISI POHON === */
-struct Pohon {
-    float posX, posY, posZ;
-    float sizeW, sizeH, sizeD;
-};
 
 const int LIMIT_POHON = 20;
 int nbElmPohon = 0;
@@ -121,11 +130,6 @@ const float WORLD_MIN_Z = -50.0f;
 
 int pathGrid[GRID_W][GRID_H]; // 0 = jalan, 1 = obstacle
 
-struct PathNode {
-    int x;
-    int z;
-};
-
 std::vector<PathNode> zombiePath[LIMIT_ZOMBIES];
 int lastPathUpdate[LIMIT_ZOMBIES];
 
@@ -139,14 +143,10 @@ int winWidth  = 1280;
 int winHeight = 720;
 
 // ===================== MINI-MAP CONFIG ===================== //
-// Posisi dan ukuran kotak mini-map di layar (kiri atas)
-// Untuk nambah jangkauan world yang ditampilkan ? naikkan MAP_WORLD_RANGE
-// Untuk perbesar kotak visual ? naikkan MAP_SIZE
-const float MAP_X           = 20.0f;   // jarak dari tepi kiri layar (px)
-const float MAP_Y_FROM_TOP  = 220.0f;  // geser ke bawah supaya tidak nutupin HP bar
-const float MAP_SIZE        = 160.0f;  // lebar & tinggi kotak (px)
+const float MAP_X = 20.0f;             // jarak dari tepi kiri layar (px)
+const float MAP_Y_FROM_TOP = 220.0f;   // geser ke bawah supaya tidak nutupin HP bar
+const float MAP_SIZE = 160.0f;         // lebar & tinggi kotak (px)
 const float MAP_WORLD_RANGE = 40.0f;   // jangkauan dunia yang dicakup map (-range..+range)
-// Untuk tiap tipe objek baru ? tambahkan warna & ukuran dot-nya di drawMiniMap()
 
 // ===================== POHON ===================== //
 Pohon makePohon(float x, float y, float z,
@@ -1289,9 +1289,9 @@ void init() {
     }
 
     nbElmPohon = 0;
-    makePohon(-4.0f, -1.0f,  -8.0f, 0.35f, 1.8f, 0.35f);
-    makePohon( 3.0f, -1.0f, -12.0f, 0.35f, 1.8f, 0.35f);
-    makePohon( 7.0f, -1.0f,  -5.0f, 0.35f, 1.8f, 0.35f);
+    makePohon(-4.0f, -1.0f, -8.0f, 0.35f, 1.8f, 0.35f);
+    makePohon(3.0f, -1.0f, -12.0f, 0.35f, 1.8f, 0.35f);
+    makePohon(7.0f, -1.0f, -5.0f, 0.35f, 1.8f, 0.35f);
     makePohon(-8.0f, -1.0f, -18.0f, 0.35f, 1.8f, 0.35f);
     makePohon(12.0f, -1.0f, -22.0f, 0.35f, 1.8f, 0.35f);
 
@@ -1317,7 +1317,7 @@ void init() {
 
     textureFloor  = loadBMPTexture("D:/SMSTR_4/GTI/Prak GTI/CobaZombie/lantai.bmp");
     textureTable  = loadBMPTexture("D:/SMSTR_4/GTI/Prak GTI/CobaZombie/meja.bmp");
-//    textureLangit  = loadBMPTexture("D:/SMSTR_4/GTI/Prak GTI/CobaZombie/langit.bmp");
+//  textureLangit  = loadBMPTexture("D:/SMSTR_4/GTI/Prak GTI/CobaZombie/langit.bmp");
     
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -1331,9 +1331,6 @@ void init() {
     glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
     glClearColor(0.53f, 0.81f, 0.98f, 1.0f);
     glEnable(GLUT_MULTISAMPLE);
-    // GL_POLYGON_SMOOTH dinonaktifkan ï¿½ kalau aktif bareng GL_BLEND akan
-    // menghasilkan garis artifact di setiap edge polygon (garis putus-putus horizontal)
-    // Anti-aliasing sudah ditangani GLUT_MULTISAMPLE di atas
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glEnable(GL_BLEND);
@@ -1351,27 +1348,6 @@ void renderText(float x, float y, void* font, const char* string) {
 }
 
 // ===================== MINI-MAP HUD ===================== //
-/*
- * Cara menambah objek baru ke mini-map:
- * 1. Buat array posisi global (misal: barrelX[], barrelZ[])
- * 2. Di dalam drawMiniMap(), copy blok "--- Meja ---" dan sesuaikan:
- *    - Ganti tableX/tableZ dengan array baru
- *    - Ganti numTables dengan jumlah objek baru
- *    - Ganti warna glColor3f sesuai jenis objek
- *    - Sesuaikan dotSize jika perlu
- * Tidak perlu ubah apapun selain isi fungsi ini.
- *
- * Cara memperbesar jangkauan map:
- *    Ubah konstanta MAP_WORLD_RANGE di atas (default 40 = range -20..+20 unit dunia)
- *
- * Legenda warna default:
- *    Oranye  = Meja / Rintangan statis
- *    Merah   = Zombie (segitiga ? arah gerak)
- *    Cyan    = Player (segitiga ? arah kamera)
- */
-
-// Helper worldToMap ï¿½ tidak bisa lambda karena kompiler C++98/MinGW lama
-// Pakai variabel global map sementara yang diset sebelum dipanggil
 static float g_mapX, g_mapY, g_mapSize, g_mapScale;
 
 void worldToMap(float wx, float wz, float &sx, float &sy) {
@@ -1387,31 +1363,34 @@ void drawMiniMap() {
 
     /* === ALGORITMA === */
     // Hitung posisi Y map dari atas layar ? koordinat Ortho2D (Y dari bawah)
-    mapX    = MAP_X;
+    mapX = MAP_X;
     mapSize = MAP_SIZE;
-    mapY    = (float)winHeight - MAP_Y_FROM_TOP - mapSize;
+    mapY = (float)winHeight - MAP_Y_FROM_TOP - mapSize;
     mapScale = mapSize / MAP_WORLD_RANGE;
 
     // Set variabel global helper sebelum memanggil worldToMap()
-    g_mapX = mapX; g_mapY = mapY; g_mapSize = mapSize; g_mapScale = mapScale;
+    g_mapX = mapX;
+    g_mapY = mapY;
+    g_mapSize = mapSize;
+    g_mapScale = mapScale;
 
     // --- Background map (hitam semi-transparan) ---
     glColor4f(0.0f, 0.0f, 0.0f, 0.55f);
     glBegin(GL_QUADS);
-        glVertex2f(mapX,          mapY);
+        glVertex2f(mapX, mapY);
         glVertex2f(mapX + mapSize, mapY);
         glVertex2f(mapX + mapSize, mapY + mapSize);
-        glVertex2f(mapX,          mapY + mapSize);
+        glVertex2f(mapX, mapY + mapSize);
     glEnd();
 
     // --- Garis border map ---
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1.5f);
     glBegin(GL_LINE_LOOP);
-        glVertex2f(mapX,          mapY);
+        glVertex2f(mapX, mapY);
         glVertex2f(mapX + mapSize, mapY);
         glVertex2f(mapX + mapSize, mapY + mapSize);
-        glVertex2f(mapX,          mapY + mapSize);
+        glVertex2f(mapX, mapY + mapSize);
     glEnd();
 
     // --- Label ---
@@ -1458,11 +1437,11 @@ void drawMiniMap() {
 
         // Arah hadap zombie di map (zomAngleY: 0 = ke -Z, 90 = ke -X, dll.)
         // +90 offset karena konvensi sumbu kamera vs. sumbu map
-        float rad     = (zomAngleY[i] + 90.0f) * (float)M_PI / 180.0f;
-        float tipX    = sx + cosf(rad) * (dotSize + 2);
-        float tipY    = sy + sinf(rad) * (dotSize + 2);
-        float bAng1   = rad + (float)M_PI * 0.75f;
-        float bAng2   = rad - (float)M_PI * 0.75f;
+        float rad = (zomAngleY[i] + 90.0f) * (float)M_PI / 180.0f;
+        float tipX = sx + cosf(rad) * (dotSize + 2);
+        float tipY = sy + sinf(rad) * (dotSize + 2);
+        float bAng1 = rad + (float)M_PI * 0.75f;
+        float bAng2 = rad - (float)M_PI * 0.75f;
 
         glColor3f(1.0f, 0.15f, 0.15f);
         glBegin(GL_TRIANGLES);
@@ -1505,7 +1484,6 @@ void drawMiniMap() {
 
     glDisable(GL_SCISSOR_TEST);
 
-    // --- Garis tengah (crosshair map) sebagai referensi pusat ---
     glColor4f(1.0f, 1.0f, 1.0f, 0.15f);
     glLineWidth(1.0f);
     float cx = mapX + mapSize * 0.5f;
@@ -1701,7 +1679,6 @@ void display() {
             }
 
             // ===================== MINI-MAP ===================== //
-            // Selalu digambar terakhir supaya tidak tertimpa elemen HUD lain
             drawMiniMap();
 
         glPopMatrix();
