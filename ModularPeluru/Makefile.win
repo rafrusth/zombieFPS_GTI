@@ -1,17 +1,17 @@
-# Project: ModularPeluru
+# Project: Project4
 # Makefile created by Dev-C++ 5.7.1
 
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = game.o globals.o main.o pathfinding.o render.o hud.o aabb.o
-LINKOBJ  = game.o globals.o main.o pathfinding.o render.o hud.o aabb.o
-LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/lib" -static-libstdc++ -static-libgcc -mwindows -lglut32 -lglu32 -lopengl32 -lwinmm -lgdi32
+OBJ      = aabb.o game.o globals.o hud.o main.o pathfinding.o render.o
+LINKOBJ  = aabb.o game.o globals.o hud.o main.o pathfinding.o render.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/lib" -lopengl32 -lglu32 -lfreeglut -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include/c++"
-BIN      = ModularPeluru.exe
-CXXFLAGS = $(CXXINCS) 
-CFLAGS   = $(INCS) -DGLUT_STATIC
+BIN      = Project4.exe
+CXXFLAGS = $(CXXINCS) -g3 -mwindows
+CFLAGS   = $(INCS) -g3 -mwindows
 RM       = rm.exe -f
 
 .PHONY: all all-before all-after clean clean-custom
@@ -24,11 +24,17 @@ clean: clean-custom
 $(BIN): $(OBJ)
 	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
 
+aabb.o: aabb.cpp
+	$(CPP) -c aabb.cpp -o aabb.o $(CXXFLAGS)
+
 game.o: game.cpp
 	$(CPP) -c game.cpp -o game.o $(CXXFLAGS)
 
 globals.o: globals.cpp
 	$(CPP) -c globals.cpp -o globals.o $(CXXFLAGS)
+
+hud.o: hud.cpp
+	$(CPP) -c hud.cpp -o hud.o $(CXXFLAGS)
 
 main.o: main.cpp
 	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
@@ -38,9 +44,3 @@ pathfinding.o: pathfinding.cpp
 
 render.o: render.cpp
 	$(CPP) -c render.cpp -o render.o $(CXXFLAGS)
-
-hud.o: hud.cpp
-	$(CPP) -c hud.cpp -o hud.o $(CXXFLAGS)
-
-aabb.o: aabb.cpp
-	$(CPP) -c aabb.cpp -o aabb.o $(CXXFLAGS)

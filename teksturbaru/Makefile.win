@@ -1,0 +1,46 @@
+# Project: Project1
+# Makefile created by Dev-C++ 5.7.1
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = ../ModularPeluru/aabb.o ../ModularPeluru/game.o ../ModularPeluru/globals.o ../ModularPeluru/hud.o ../ModularPeluru/main.o ../ModularPeluru/pathfinding.o ../ModularPeluru/render.o
+LINKOBJ  = ../ModularPeluru/aabb.o ../ModularPeluru/game.o ../ModularPeluru/globals.o ../ModularPeluru/hud.o ../ModularPeluru/main.o ../ModularPeluru/pathfinding.o ../ModularPeluru/render.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/lib" -lopengl32 -lglu32 -lfreeglut -g3
+INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include"
+CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include/c++"
+BIN      = Project1.exe
+CXXFLAGS = $(CXXINCS) -g3 -mwindows
+CFLAGS   = $(INCS) -g3 -mwindows
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+../ModularPeluru/aabb.o: ../ModularPeluru/aabb.cpp
+	$(CPP) -c ../ModularPeluru/aabb.cpp -o ../ModularPeluru/aabb.o $(CXXFLAGS)
+
+../ModularPeluru/game.o: ../ModularPeluru/game.cpp
+	$(CPP) -c ../ModularPeluru/game.cpp -o ../ModularPeluru/game.o $(CXXFLAGS)
+
+../ModularPeluru/globals.o: ../ModularPeluru/globals.cpp
+	$(CPP) -c ../ModularPeluru/globals.cpp -o ../ModularPeluru/globals.o $(CXXFLAGS)
+
+../ModularPeluru/hud.o: ../ModularPeluru/hud.cpp
+	$(CPP) -c ../ModularPeluru/hud.cpp -o ../ModularPeluru/hud.o $(CXXFLAGS)
+
+../ModularPeluru/main.o: ../ModularPeluru/main.cpp
+	$(CPP) -c ../ModularPeluru/main.cpp -o ../ModularPeluru/main.o $(CXXFLAGS)
+
+../ModularPeluru/pathfinding.o: ../ModularPeluru/pathfinding.cpp
+	$(CPP) -c ../ModularPeluru/pathfinding.cpp -o ../ModularPeluru/pathfinding.o $(CXXFLAGS)
+
+../ModularPeluru/render.o: ../ModularPeluru/render.cpp
+	$(CPP) -c ../ModularPeluru/render.cpp -o ../ModularPeluru/render.o $(CXXFLAGS)
