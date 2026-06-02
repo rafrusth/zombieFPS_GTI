@@ -11,17 +11,17 @@ bool  isShooting = false;
 bool  keys[256]  = {false};
 
 // ===================== PEMAIN ===================== //
-float posX = 0.0f;
-float posY = -0.37f;
-float posZ = 5.0f;
-float playerHealth = 100.0f;
-bool  isDead       = false;
+float posX           = 0.0f;
+float posY           = -0.37f;
+float posZ           = 5.0f;
+float playerHealth   = 100.0f;
+bool  isDead         = false;
 int   lastDamageTime = 0;
 int   damageDelay    = 1000;
-bool  isWin = false;
+bool  isWin          = false;
 
 // ===================== PISTOL ===================== //
-int ammo = 12;
+int ammo    = 12;
 int maxAmmo = 12;
 
 // ===================== WINDOW ===================== //
@@ -29,9 +29,7 @@ int winWidth  = 1280;
 int winHeight = 720;
 
 // ===================== MEJA ===================== //
-int   numTables = 0;
-float tableX[LIMIT_TABLES];
-float tableZ[LIMIT_TABLES];
+int   numTables   = 0;
 float tableY      = 0.0f;
 float tableW      = 0.5f;
 float tableH      = 0.08f;
@@ -39,6 +37,8 @@ float tableD      = 1.0f;
 float tableFootW  = 0.1f;
 float tableFootH  = 0.48f;
 float tableFootD  = 0.1f;
+float tableX[LIMIT_TABLES];
+float tableZ[LIMIT_TABLES];
 
 // ===================== POHON ===================== //
 int   nbElmPohon = 0;
@@ -63,17 +63,20 @@ float sunY = 15.0f;
 float sunZ = -30.0f;
 
 // ===================== TEXTURE ===================== //
-GLuint textureFloor = 0;
-GLuint textureTable = 0;
-GLuint textureSky   = 0;
-GLuint textureSkyWin= 0;
-GLuint textureSkyLose= 0;
+GLuint textureFloor   = 0;
+GLuint textureTable   = 0;
+GLuint textureSky     = 0;
+GLuint textureSkyWin  = 0;
+GLuint textureSkyLose = 0;
 
 // ===================== A* ===================== //
 int pathGrid[GRID_W][GRID_H];
-std::vector<PathNode> zombiePath[LIMIT_ZOMBIES];
 int lastPathUpdate[LIMIT_ZOMBIES];
+std::vector<PathNode> zombiePath[LIMIT_ZOMBIES];
 
 // ===================== MINI-MAP ===================== //
-float g_mapX = 0, g_mapY = 0, g_mapSize = 0, g_mapScale = 0;
+float g_mapX     = 0;
+float g_mapY     = 0;
+float g_mapSize  = 0;
+float g_mapScale = 0;
 

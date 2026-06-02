@@ -8,26 +8,37 @@
 // ===================== HELPER POHON ===================== //
 // Fungsi biasa (bukan lambda) supaya kompatibel Dev-C++ / MinGW lama
 static void makePohon(float x, float y, float z,
-                      float w, float h, float d) {
+                        float w, float h, float d) {
     /* === KAMUS LOKAL === */
     Pohon p;
 
     /* === ALGORITMA === */
-    if (nbElmPohon >= LIMIT_POHON) return;
-    p.posX  = x; p.posY  = y; p.posZ  = z;
-    p.sizeW = w; p.sizeH = h; p.sizeD = d;
+    if (nbElmPohon >= LIMIT_POHON) {
+        return;
+    }
+
+    p.posX  = x;
+    p.posY  = y;
+    p.posZ  = z;
+    p.sizeW = w;
+    p.sizeH = h;
+    p.sizeD = d;
+
     listPohon[nbElmPohon] = p;
     nbElmPohon++;
 }
 
 // ===================== INIT ===================== //
 void initGame() {
-    int i;
+    /* === KAMUS LOKAL === */
+    int i, gx, gz, tries;
+
+    /* === ALGORITMA === */
     srand(time(NULL));
 
     // Spawn meja
     numTables = (rand() % 10) + 3;
-    for (i=0; i<numTables; i++) {
+    for (i = 0; i < numTables; i++) {
         tableX[i] = (rand()%40) - 10.0f;
         tableZ[i] = (rand()%40) - 20.0f;
     }
@@ -44,20 +55,25 @@ void initGame() {
 
     // Spawn zombie di cell yang bisa dilewati
     numZombies = 5;
-    for (i=0; i<numZombies; i++) {
-        int gx, gz, tries=0;
+    for (i = 0; i < numZombies; i++) {
+        tries = 0;
         do {
             zomX[i] = (rand()%40) - 20.0f;
             zomZ[i] = (rand()%40) - 30.0f;
             tries++;
             worldToGrid(zomX[i], zomZ[i], gx, gz);
-        } while ((!worldToGrid(zomX[i],zomZ[i],gx,gz) ||
-                  !isWalkable(gx,gz) ||
-                  positionHitsTable(zomX[i],zomZ[i])) && tries < 100);
+        } while ((!worldToGrid(zomX[i],zomZ[i],gx,gz)
+                    ||
+                    !isWalkable(gx,gz)
+                    ||
+                    positionHitsTable(zomX[i],zomZ[i]))
+                        &&
+                        tries < 100);
 
-        zomAngleY[i]     = 0.0f;
+        zomAngleY[i] = 0.0f;
         lastPathUpdate[i] = 0;
         zombieHealth[i] = 100.0f;
+
         calculateZombiePath(i);
     }
 
@@ -89,29 +105,39 @@ void initGame() {
 
 // ===================== RESET GAME (RESTART) ===================== //
 void resetGame() {
-    int i;
+    /* === KAMUS LOKAL === */
+    int i, gx, gz, tries;
+
+    /* === ALGORITMA === */
 
     // Reset status pemain
-    posX=0.0f; posY=-0.37f; posZ=5.0f;
-    playerHealth  = 100.0f;
-    isDead        = false;
-    lastDamageTime= 0;
-    isWin         = false;
-    ammo          = maxAmmo;
+    posX = 0.0f;
+    posY =- 0.37f;
+    posZ = 5.0f;
+    playerHealth = 100.0f;
+    isDead = false;
+    lastDamageTime = 0;
+    isWin = false;
+    ammo = maxAmmo;
 
     // Reset kamera
-    camAngleX=0.0f; camAngleY=0.0f;
-    camDist=3.0f; recoil=0.0f;
-    isShooting=false; viewMode=1;
+    camAngleX = 0.0f;
+    camAngleY = 0.0f;
+    camDist = 3.0f;
+    recoil = 0.0f;
+    isShooting = false;
+    viewMode=1;
 
     // Bersihkan semua key yang masih tertekan
-    for (i=0; i<256; i++) keys[i]=false;
+    for (i = 0; i < 256; i++) {
+        keys[i] = false;
+    }
 
     // Spawn ulang meja
-    numTables = (rand()%10)+3;
-    for (i=0; i<numTables; i++) {
-        tableX[i]=(rand()%40)-10.0f;
-        tableZ[i]=(rand()%40)-20.0f;
+    numTables = (rand() % 10) + 3;
+    for (i = 0; i < numTables; i++) {
+        tableX[i] = (rand() % 40) - 10.0f;
+        tableZ[i] = (rand() % 40) - 20.0f;
     }
 
     // Rebuild path grid dulu sebelum spawn zombie
@@ -119,21 +145,26 @@ void resetGame() {
 
     // Spawn ulang zombie
     numZombies = 5;
-    for (i=0; i<numZombies; i++) {
-        int gx, gz, tries=0;
+    for (i = 0; i < numZombies; i++) {
+        tries = 0;
         do {
-            zomX[i]=(rand()%40)-20.0f;
-            zomZ[i]=(rand()%40)-30.0f;
+            zomX[i] = (rand() % 40) - 20.0f;
+            zomZ[i] = (rand() % 40) - 30.0f;
             tries++;
             worldToGrid(zomX[i],zomZ[i],gx,gz);
-        } while ((!worldToGrid(zomX[i],zomZ[i],gx,gz) ||
-                  !isWalkable(gx,gz) ||
-                  positionHitsTable(zomX[i],zomZ[i])) && tries<100);
+        } while ((!worldToGrid(zomX[i],zomZ[i],gx,gz)
+                    ||
+                    !isWalkable(gx,gz)
+                    ||
+                    positionHitsTable(zomX[i],zomZ[i]))
+                        &&
+                        tries<100);
 
-        zomAngleY[i]     = 0.0f;
+        zomAngleY[i] = 0.0f;
         lastPathUpdate[i] = 0;
         zombieHealth[i] = 100.0f;
         zombiePath[i].clear();
+
         calculateZombiePath(i);
     }
 
@@ -143,16 +174,26 @@ void resetGame() {
 
 // ===================== ZOMBIE ATTACK ===================== //
 void zombieAttack() {
-    int currentTime = glutGet(GLUT_ELAPSED_TIME);
-    if (isDead) return;
+    /* === KAMUS LOKAL === */
+    int currentTime, i;
+    AABB playerBox;
 
-    AABB playerBox = getPlayerAABB();
-    for (int i=0; i<numZombies; i++) {
+    /* === ALGORITMA === */
+    currentTime = glutGet(GLUT_ELAPSED_TIME);
+    if (isDead) {
+        return;
+    }
+
+    playerBox = getPlayerAABB();
+    for (i = 0; i < numZombies; i++) {
         if (checkAABB(playerBox, getZombieAABB(i))) {
             if (currentTime - lastDamageTime > damageDelay) {
                 playerHealth -= 10;
                 lastDamageTime = currentTime;
-                if (playerHealth <= 0) { isDead=true; break; }
+                if (playerHealth <= 0) {
+                    isDead = true;
+                    break;
+                }
             }
         }
     }
@@ -160,33 +201,39 @@ void zombieAttack() {
 
 // ===================== SHOOT PISTOL ===================== //
 void shoot() {
-    if (isDead || isWin) return;
-    if (ammo <= 0) return;
+    /* === KAMUS LOKAL === */
+    float rad, dirX, dirZ;
+    float dx, dz, dot, dist;
+    int i, j;
+
+    /* === ALGORITMA === */
+    if (isDead || isWin || ammo <= 0) {
+        return;
+    }
 
     ammo--;
 
     recoil = -0.3f;
     isShooting = true;
 
-    float rad = camAngleY * 3.14159265f / 180.0f;
-    float dirX = sin(rad);
-    float dirZ = -cos(rad);
+    rad = camAngleY * 3.14159265f / 180.0f;
+    dirX = sin(rad);
+    dirZ = -cos(rad);
 
-    for (int i = 0; i < numZombies; i++) {
+    for (i = 0; i < numZombies; i++) {
 
         if (zombieHealth[i] <= 0)
             continue;
 
-        float dx = zomX[i] - posX;
-        float dz = zomZ[i] - posZ;
+        dx = zomX[i] - posX;
+        dz = zomZ[i] - posZ;
 
-        float dist = sqrt(dx*dx + dz*dz);
+        dist = sqrt((dx * dx) + (dz * dz));
 
         if (dist > 10.0f)
             continue;
 
-        float dot =
-            (dx * dirX + dz * dirZ) / dist;
+        dot = ((dx * dirX) + (dz * dirZ)) / dist;
 
         if (dot > 0.95f) {
 
@@ -194,18 +241,18 @@ void shoot() {
 
             if (zombieHealth[i] <= 0) {
 
-                for (int j = i; j < numZombies - 1; j++) {
-                    zomX[j] = zomX[j+1];
-                    zomZ[j] = zomZ[j+1];
-                    zomAngleY[j] = zomAngleY[j+1];
-                    zombieHealth[j] = zombieHealth[j+1];
-                    zombiePath[j] = zombiePath[j+1];
-                    lastPathUpdate[j] = lastPathUpdate[j+1];
+                for (j = i; j < numZombies - 1; j++) {
+                    zomX[j] = zomX[j + 1];
+                    zomZ[j] = zomZ[j + 1];
+                    zomAngleY[j] = zomAngleY[j + 1];
+                    zombieHealth[j] = zombieHealth[j + 1];
+                    zombiePath[j] = zombiePath[j + 1];
+                    lastPathUpdate[j] = lastPathUpdate[j + 1];
                 }
 
                 numZombies--;
                 if (numZombies <= 0) {
-    				isWin = true;
+                    isWin = true;
 				}
             }
 
