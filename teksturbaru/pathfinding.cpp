@@ -6,8 +6,11 @@
 
 // ===================== KONVERSI KOORDINAT ===================== //
 bool worldToGrid(float wx, float wz, int &gx, int &gz) {
-    gx = (int)((wx - WORLD_MIN_X) / CELL_SIZE);
-    gz = (int)((wz - WORLD_MIN_Z) / CELL_SIZE);
+    /* === KAMUS LOKAL === */
+
+    /* === ALGORITMA === */
+    gx = (int) ((wx - WORLD_MIN_X) / CELL_SIZE);
+    gz = (int) ((wz - WORLD_MIN_Z) / CELL_SIZE);
     return gx >= 0 && gx < GRID_W && gz >= 0 && gz < GRID_H;
 }
 
@@ -22,37 +25,64 @@ bool isWalkable(int gx, int gz) {
 }
 
 // ===================== MARK OBSTACLE (ganti lambda) ===================== //
-static int   _minGX, _maxGX, _minGZ, _maxGZ;
+static int _minGX, _maxGX, _minGZ, _maxGZ;
 
 static void markObstacle(float cx, float cz, float hw, float hd) {
+    /* === KAMUS LOKAL === */
     int gx, gz;
-    float pad  = 0.55f;
-    float minX = cx - hw - pad, maxX = cx + hw + pad;
-    float minZ = cz - hd - pad, maxZ = cz + hd + pad;
+    float pad, minX, minZ, maxX, maxZ;
+
+    /* === ALGORITMA === */
+    pad = 0.55f;
+    minX = cx - hw - pad;
+    maxX = cx + hw + pad;
+    minZ = cz - hd - pad;
+    maxZ = cz + hd + pad;
+
     worldToGrid(minX, minZ, _minGX, _minGZ);
     worldToGrid(maxX, maxZ, _maxGX, _maxGZ);
-    if (_minGX > _maxGX) std::swap(_minGX, _maxGX);
-    if (_minGZ > _maxGZ) std::swap(_minGZ, _maxGZ);
-    if (_minGX < 0)        _minGX = 0;
-    if (_maxGX >= GRID_W)  _maxGX = GRID_W - 1;
-    if (_minGZ < 0)        _minGZ = 0;
-    if (_maxGZ >= GRID_H)  _maxGZ = GRID_H - 1;
-    for (gx = _minGX; gx <= _maxGX; gx++)
-        for (gz = _minGZ; gz <= _maxGZ; gz++)
+
+    if (_minGX > _maxGX) {
+        std::swap(_minGX, _maxGX);
+    }
+    if (_minGZ > _maxGZ) {
+        std::swap(_minGZ, _maxGZ);
+    }
+    if (_minGX < 0) {
+        _minGX = 0;
+    }
+    if (_maxGX >= GRID_W) {
+        _maxGX = GRID_W - 1;
+    }
+    if (_minGZ < 0) {
+        _minGZ = 0;
+    }
+    if (_maxGZ >= GRID_H) {
+        _maxGZ = GRID_H - 1;
+    }
+    for (gx = _minGX; gx <= _maxGX; gx++) {
+        for (gz = _minGZ; gz <= _maxGZ; gz++) {
             pathGrid[gx][gz] = 1;
+        }
+    }
 }
 
 // ===================== BUILD GRID OBSTACLE ===================== //
 void buildPathGrid() {
+    /* === KAMUS LOKAL === */
     int t, p;
+
+    /* === ALGORITMA === */
     memset(pathGrid, 0, sizeof(pathGrid));
 
-    for (t = 0; t < numTables; t++)
+    for (t = 0; t < numTables; t++) {
         markObstacle(tableX[t], tableZ[t], tableW * 0.5f, tableD * 0.5f);
+    }
 
-    for (p = 0; p < nbElmPohon; p++)
+    for (p = 0; p < nbElmPohon; p++) {
         markObstacle(listPohon[p].posX, listPohon[p].posZ,
                      listPohon[p].sizeW * 0.5f, listPohon[p].sizeD * 0.5f);
+    }
 }
 
 // ===================== HELPER A* ===================== //
@@ -76,66 +106,88 @@ struct AStarItem {
 };
 
 // ===================== A* ===================== //
-static bool findPathAStar(int startX, int startZ, int goalX, int goalZ,
-                          std::vector<PathNode> &outPath) {
-    static int      gCost[GRID_W][GRID_H];
-    static bool     closedSet[GRID_W][GRID_H];
+static bool findPathAStar(int startX, int startZ, int goalX, int goalZ, std::vector<PathNode> &outPath) {
+    /* === KAMUS LOKAL === */
+    static int gCost[GRID_W][GRID_H];
+    static bool closedSet[GRID_W][GRID_H];
     static PathNode parent[GRID_W][GRID_H];
+    
+    PathNode c, p;
+    AStarItem si, ni, cur;
+    std::vector<PathNode> rev;
+    std::priority_queue<AStarItem> open;
+
 
     int dx4[4] = {1, -1, 0, 0};
-    int dz4[4] = {0,  0, 1, -1};
-    int x, z, dir, k;
-
+    int dz4[4] = {0, 0, 1, -1};
+    int x, z, dir, k, nx, ng, nz;
+    
+    /* === ALGORITMA === */
     outPath.clear();
-    if (!findNearestWalkable(startX, startZ, startX, startZ)) return false;
-    if (!findNearestWalkable(goalX,  goalZ,  goalX,  goalZ))  return false;
+    if (!findNearestWalkable(startX, startZ, startX, startZ) 
+        ||
+        !findNearestWalkable(goalX,  goalZ,  goalX,  goalZ)) {
+            return false;
+        }
 
     for (x = 0; x < GRID_W; x++)
         for (z = 0; z < GRID_H; z++) {
-            gCost[x][z]     = 999999;
+            gCost[x][z] = 999999;
             closedSet[x][z] = false;
-            parent[x][z].x  = -1;
-            parent[x][z].z  = -1;
+            parent[x][z].x = -1;
+            parent[x][z].z = -1;
         }
 
     gCost[startX][startZ] = 0;
-    std::priority_queue<AStarItem> open;
-    AStarItem si;
-    si.x = startX; si.z = startZ;
+    si.x = startX;
+    si.z = startZ;
     si.f = heuristic(startX, startZ, goalX, goalZ);
     open.push(si);
 
     while (!open.empty()) {
-        AStarItem cur = open.top(); open.pop();
-        if (closedSet[cur.x][cur.z]) continue;
+        cur = open.top();
+        open.pop();
+        if (closedSet[cur.x][cur.z]) {
+            continue;
+        }
         closedSet[cur.x][cur.z] = true;
 
         if (cur.x == goalX && cur.z == goalZ) {
-            PathNode c;
-            c.x = goalX; c.z = goalZ;
-            std::vector<PathNode> rev;
+            c.x = goalX;
+            c.z = goalZ;
+
             while (!(c.x == startX && c.z == startZ)) {
                 rev.push_back(c);
-                PathNode p = parent[c.x][c.z];
-                if (p.x == -1 || p.z == -1) return false;
+                p = parent[c.x][c.z];
+                if (p.x == -1 || p.z == -1) {
+                    return false;
+                }
                 c = p;
             }
-            for (k = (int)rev.size() - 1; k >= 0; k--)
+
+            for (k = (int) rev.size() - 1; k >= 0; k--) {
                 outPath.push_back(rev[k]);
+            }
+            
             return true;
         }
 
         for (dir = 0; dir < 4; dir++) {
-            int nx = cur.x + dx4[dir];
-            int nz = cur.z + dz4[dir];
-            if (!isWalkable(nx, nz) || closedSet[nx][nz]) continue;
-            int ng = gCost[cur.x][cur.z] + 1;
+            nx = cur.x + dx4[dir];
+            nz = cur.z + dz4[dir];
+
+            if (!isWalkable(nx, nz) || closedSet[nx][nz]) {
+                continue;
+            }
+            
+            ng = gCost[cur.x][cur.z] + 1;
+
             if (ng < gCost[nx][nz]) {
-                gCost[nx][nz]     = ng;
-                parent[nx][nz].x  = cur.x;
-                parent[nx][nz].z  = cur.z;
-                AStarItem ni;
-                ni.x = nx; ni.z = nz;
+                gCost[nx][nz] = ng;
+                parent[nx][nz].x = cur.x;
+                parent[nx][nz].z = cur.z;
+                ni.x = nx;
+                ni.z = nz;
                 ni.f = ng + heuristic(nx, nz, goalX, goalZ);
                 open.push(ni);
             }
@@ -153,33 +205,57 @@ void calculateZombiePath(int i) {
 }
 
 // ===================== COLLISION CHECK ===================== //
-bool positionHitsTable(float x, float z) {
+bool positionHitsObjects(float x, float z) {
+    /* === KAMUS LOKAL === */
     AABB test;
     int t, p;
-    test.minX = x - 0.25f; test.maxX = x + 0.25f;
-    test.minY = zomY;       test.maxY = zomY + 0.9f;
-    test.minZ = z - 0.25f; test.maxZ = z + 0.25f;
-    for (t = 0; t < numTables; t++)
-        if (checkAABB(test, getTableAABB(t))) return true;
-    for (p = 0; p < nbElmPohon; p++)
-        if (checkAABB(test, getPohonAABB(p))) return true;
+
+    /* === ALGORITMA === */
+    test.minX = x - 0.25f; 
+    test.maxX = x + 0.25f;
+    test.minY = zomY;      
+    test.maxY = zomY + 0.9f;
+    test.minZ = z - 0.25f;
+    test.maxZ = z + 0.25f;
+
+    for (t = 0; t < numTables; t++) {
+        if (checkAABB(test, getTableAABB(t))) {
+            return true;
+        }
+    }
+
+    for (p = 0; p < nbElmPohon; p++) {
+        if (checkAABB(test, getPohonAABB(p))) {
+            return true;
+        }
+    }
+
     return false;
 }
 
-bool willHitTable(float x, float z) { return positionHitsTable(x, z); }
-
 // ===================== STEERING ===================== //
 static bool tryMoveZombie(int i, float dirX, float dirZ, float speedMul) {
-    float len = sqrt(dirX * dirX + dirZ * dirZ);
-    if (len <= 0.001f) return false;
-    dirX /= len; dirZ /= len;
-    float nx = zomX[i] + dirX * zomSpeed * speedMul;
-    float nz = zomZ[i] + dirZ * zomSpeed * speedMul;
-    if (!willHitTable(nx, nz)) {
-        zomX[i]      = nx; zomZ[i] = nz;
+    /* === KAMUS LOKAL === */
+    float len, nx, nz;
+
+    /* === ALGORITMA === */
+    len = sqrt(dirX * dirX + dirZ * dirZ);
+    if (len <= 0.001f) {
+        return false;
+    }
+
+    dirX /= len;
+    dirZ /= len;
+    nx = zomX[i] + dirX * zomSpeed * speedMul;
+    nz = zomZ[i] + dirZ * zomSpeed * speedMul;
+
+    if (!positionHitsObjects(nx, nz)) {
+        zomX[i] = nx;
+        zomZ[i] = nz;
         zomAngleY[i] = atan2(-dirX, -dirZ) * 180.0f / 3.14159265f;
         return true;
     }
+
     return false;
 }
 
@@ -234,7 +310,7 @@ void updateZombie(int i) {
     nx   = zomX[i] + dX * step;
     nz   = zomZ[i] + dZ * step;
 
-    if (willHitTable(nx, nz))
+    if (positionHitsObjects(nx, nz))
         doSteeringAvoidance(i, dX, dZ);
     else {
         zomX[i]      = nx; zomZ[i] = nz;
