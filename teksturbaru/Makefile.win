@@ -1,4 +1,4 @@
-# Project: TeksturNew
+# Project: Project6
 # Makefile created by Dev-C++ 5.7.1
 
 CPP      = g++.exe
@@ -6,12 +6,12 @@ CC       = gcc.exe
 WINDRES  = windres.exe
 OBJ      = aabb.o game.o globals.o hud.o main.o pathfinding.o render.o
 LINKOBJ  = aabb.o game.o globals.o hud.o main.o pathfinding.o render.o
-LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/lib" -static-libstdc++ -static-libgcc -mwindows -lglut32 -lglu32 -lopengl32 -lwinmm -lgdi32
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/lib" -lopengl32 -lglu32 -lfreeglut -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include/c++"
-BIN      = TeksturNew.exe
-CXXFLAGS = $(CXXINCS) 
-CFLAGS   = $(INCS) -DGLUT_STATIC
+BIN      = ZV.exe
+CXXFLAGS = $(CXXINCS) -g3 -mwindows
+CFLAGS   = $(INCS) -g3 -mwindows
 RM       = rm.exe -f
 
 .PHONY: all all-before all-after clean clean-custom

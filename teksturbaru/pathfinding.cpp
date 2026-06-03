@@ -154,15 +154,30 @@ void calculateZombiePath(int i) {
 
 // ===================== COLLISION CHECK ===================== //
 bool positionHitsTable(float x, float z) {
+    /* === KAMUS LOKAL === */
     AABB test;
     int t, p;
-    test.minX = x - 0.25f; test.maxX = x + 0.25f;
-    test.minY = zomY;       test.maxY = zomY + 0.9f;
-    test.minZ = z - 0.25f; test.maxZ = z + 0.25f;
-    for (t = 0; t < numTables; t++)
-        if (checkAABB(test, getTableAABB(t))) return true;
-    for (p = 0; p < nbElmPohon; p++)
-        if (checkAABB(test, getPohonAABB(p))) return true;
+
+    /* === ALGORITMA === */
+    test.minX = x - 0.25f;
+    test.maxX = x + 0.25f;
+    test.minY = zomY;      
+    test.maxY = zomY + 0.9f;
+    test.minZ = z - 0.25f;
+    test.maxZ = z + 0.25f;
+
+    for (t = 0; t < numTables; t++) {
+        if (checkAABB(test, getTableAABB(t))) {
+            return true;
+        }
+    }
+
+    for (p = 0; p < nbElmPohon; p++) {
+        if (checkAABB(test, getPohonAABB(p))) {
+            return true;
+        }
+    }
+    
     return false;
 }
 
