@@ -166,10 +166,10 @@ void drawHUD() {
 
 	// === DISPLAY AMMO ===
 	char ammoText[50];
-	sprintf(ammoText, "Ammo : %d / %d", ammo, maxAmmo);
+	sprintf(ammoText, "Ammo: %d / %d", ammo, maxAmmo);
 
 	glColor3f(1,1,1);
-	renderText(bx, by-75, GLUT_BITMAP_9_BY_15, ammoText);
+	renderText(bx, by-600, GLUT_BITMAP_9_BY_15, ammoText);
 	
 	// === CROSSHAIR / BIDIKAN ===
 	float cx = winWidth / 2;
@@ -207,12 +207,12 @@ void drawHUD() {
 
         // Teks "GAME OVER"
         glColor3f(1.0f, 0.15f, 0.15f);
-        renderText(536, 400, GLUT_BITMAP_TIMES_ROMAN_24, "GAME  OVER");
+        renderText(580, 400, GLUT_BITMAP_TIMES_ROMAN_24, "GAME  OVER");
 
         // Instruksi
         glColor3f(1.0f,1.0f,1.0f);
-        renderText(482, 355, GLUT_BITMAP_9_BY_15, "Tekan  [R]  untuk  Restart");
-        renderText(470, 320, GLUT_BITMAP_9_BY_15, "Tekan  [ESC]  untuk  Keluar");
+        renderText(525, 355, GLUT_BITMAP_9_BY_15, "Tekan  [R]  untuk  Restart");
+        renderText(515, 320, GLUT_BITMAP_9_BY_15, "Tekan  [ESC]  untuk  Keluar");
     }
     
 	// === WIN OVERLAY ===================== //
@@ -234,11 +234,11 @@ void drawHUD() {
     	glEnd();
 
     	glColor3f(0.2f, 1.0f, 0.2f);
-    	renderText(555, 400, GLUT_BITMAP_TIMES_ROMAN_24, "YOU  WIN");
+    	renderText(580, 400, GLUT_BITMAP_TIMES_ROMAN_24, "YOU  WIN");
 
     	glColor3f(1.0f,1.0f,1.0f);
-    	renderText(482, 355, GLUT_BITMAP_9_BY_15, "Tekan  [R]  untuk  Restart");
-    	renderText(470, 320, GLUT_BITMAP_9_BY_15, "Tekan  [ESC]  untuk  Keluar");
+    	renderText(525, 355, GLUT_BITMAP_9_BY_15, "Tekan  [R]  untuk  Restart");
+    	renderText(515, 320, GLUT_BITMAP_9_BY_15, "Tekan  [ESC]  untuk  Keluar");
 	}
     drawMiniMap();
 }

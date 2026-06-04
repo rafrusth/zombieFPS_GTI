@@ -14,8 +14,12 @@ static void makePohon(float x, float y, float z,
 
     /* === ALGORITMA === */
     if (nbElmPohon >= LIMIT_POHON) return;
-    p.posX  = x; p.posY  = y; p.posZ  = z;
-    p.sizeW = w; p.sizeH = h; p.sizeD = d;
+    p.posX  = x;
+	p.posY  = y;
+	p.posZ  = z;
+    p.sizeW = w;
+	p.sizeH = h;
+	p.sizeD = d;
     listPohon[nbElmPohon] = p;
     nbElmPohon++;
 }
@@ -169,7 +173,10 @@ void zombieAttack() {
 // ===================== SHOOT PISTOL ===================== //
 void shoot() {
     if (isDead || isWin) return;
-    if (ammo <= 0) return;
+    if (ammo <= 0) {
+        isShooting = false;
+        return;
+    }
 
     ammo--;
 
@@ -190,15 +197,15 @@ void shoot() {
 
         float dist = sqrt(dx*dx + dz*dz);
 
-        if (dist > 10.0f)
+        if (dist > 100.0f)
             continue;
 
         float dot =
             (dx * dirX + dz * dirZ) / dist;
 
-        if (dot > 0.95f) {
+        if (dot > 0.9999f) {
 
-            zombieHealth[i] -= 50.0f;
+            zombieHealth[i] -= 15.0f;
 
             if (zombieHealth[i] <= 0) {
 

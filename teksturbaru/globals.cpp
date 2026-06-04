@@ -21,8 +21,8 @@ int   damageDelay    = 1000;
 bool  isWin = false;
 
 // ===================== PISTOL ===================== //
-int ammo = 12;
-int maxAmmo = 12;
+int ammo = 67;
+int maxAmmo = 67;
 
 // ===================== WINDOW ===================== //
 int winWidth  = 1280;

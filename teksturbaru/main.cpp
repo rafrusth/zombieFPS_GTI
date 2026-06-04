@@ -305,13 +305,30 @@ void mouseMove(int x, int y) {
     if (x<100||x>900||y<100||y>600) { lastX=500; lastY=350; glutWarpPointer(500,350); }
 }
 
+void rapidFireTimer(int value) {
+    if (!isShooting || ammo <= 0) {
+        isShooting = false;
+        return; 
+    }
+
+    shoot();
+    
+    glutPostRedisplay(); 
+
+    glutTimerFunc(100, rapidFireTimer, 0);
+}
+
 void mouseClick(int b, int s, int x, int y) {
-     if (b == GLUT_LEFT_BUTTON) {
-
-        isShooting = (s == GLUT_DOWN);
-
+    if (b == GLUT_LEFT_BUTTON) {
         if (s == GLUT_DOWN) {
-            shoot();
+            if (!isShooting) {
+                isShooting = true;
+                shoot();
+                
+                glutTimerFunc(100, rapidFireTimer, 0); 
+            }
+        } else if (s == GLUT_UP) {
+            isShooting = false; 
         }
     }
 }
@@ -337,7 +354,7 @@ int main(int argc, char** argv) {
     screenWidth =glutGet(GLUT_SCREEN_WIDTH);
     screenHeight=glutGet(GLUT_SCREEN_HEIGHT);
     glutInitWindowPosition((screenWidth-windowWidth)/2,(screenHeight-windowHeight)/2);
-    glutCreateWindow("Blocky Zombie FPS - Kelompok 6");
+    glutCreateWindow("ZombieVerse");
     glutWarpPointer(500,350);
 
     initGame();
