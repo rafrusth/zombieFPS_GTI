@@ -1,16 +1,17 @@
-/*  Nama File   :   ZombieVerse (Modular)
+/*  Nama File   :   ZombieVerse
     Matakuliah  :   Grafik dan Teknik Interaktif 
     Kelompok    :   6
     Anggota     :   Rafif Setya Imaduddin  24060124130115
                     Raffi Arditama         24060124120020
                     Felicia Evelina        24060124120012
                     Anggita Kirana Puspa   24060124130064
-    Keyboard    :   W/A/S/D = Gerak
-                    1-4     = Mode Proyeksi
-                    = / -   = Zoom In/Out
-                    R       = Restart (saat Game Over)
-                    ESC     = Keluar
-                    LMB     = Tembak
+    Keyboard    :   W/A/S/D    = Gerak
+                    1-4        = Mode Proyeksi
+                    = / -      = Zoom In/Out
+                    Mouse Kiri = Tembak
+                    E		   = Reload Senjata
+                    R          = Restart (saat Game Over atau Menang)
+                    ESC        = Keluar
 */
 
 #include "globals.h"
