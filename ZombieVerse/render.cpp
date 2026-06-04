@@ -29,15 +29,15 @@ void drawCuboid(float w, float h, float d,
     y = h * 0.5f;
     z = d * 0.5f;
     glBegin(GL_QUADS);
-        glNormal3f(0,0,1);  glColor3f(fR,fG,fB);
+        glNormal3f(0,0,1); glColor3f(fR,fG,fB);
         glVertex3f(-x,-y,z); glVertex3f(x,-y,z); glVertex3f(x,y,z); glVertex3f(-x,y,z);
-        glNormal3f(0,0,-1); glColor3f(fR*.8f,fG*.8f,fB*.8f);
+        glNormal3f(0,0,-1); glColor3f(fR * 0.8f,fG * 0.8f,fB * 0.8f);
         glVertex3f(x,-y,-z); glVertex3f(-x,-y,-z); glVertex3f(-x,y,-z); glVertex3f(x,y,-z);
         glNormal3f(-1,0,0); glColor3f(sR,sG,sB);
         glVertex3f(-x,-y,-z); glVertex3f(-x,-y,z); glVertex3f(-x,y,z); glVertex3f(-x,y,-z);
-        glNormal3f(1,0,0);  glColor3f(sR,sG,sB);
+        glNormal3f(1,0,0); glColor3f(sR,sG,sB);
         glVertex3f(x,-y,z); glVertex3f(x,-y,-z); glVertex3f(x,y,-z); glVertex3f(x,y,z);
-        glNormal3f(0,1,0);  glColor3f(tR,tG,tB);
+        glNormal3f(0,1,0); glColor3f(tR,tG,tB);
         glVertex3f(-x,y,z); glVertex3f(x,y,z); glVertex3f(x,y,-z); glVertex3f(-x,y,-z);
         glNormal3f(0,-1,0); glColor3f(bR,bG,bB);
         glVertex3f(-x,-y,-z); glVertex3f(x,-y,-z); glVertex3f(x,-y,z); glVertex3f(-x,-y,z);
@@ -142,7 +142,6 @@ static void drawArmZombie() {
     float sleeveH, armH;
 
     /* === ALGORITMA === */
-
     w = 0.25f;
     h = 0.65f;
     d = 0.25f;
@@ -471,7 +470,7 @@ void drawPlayer(float size) {
         glPopMatrix();
         glPushMatrix();
             glTranslatef(0.35f,0.2f,0.0f);
-            glRotatef(90.0f-(recoil*100.0f),1.0f,0.0f,0.0f);
+            glRotatef(90.0f - (recoil * 100.0f),1.0f,0.0f,0.0f);
             glTranslatef(0.0f,-0.3f,0.0f);
             drawCuboid(0.20f,0.60f,0.20f, 0.85f,0.65f,0.50f, 0.80f,0.60f,0.45f, 0.88f,0.68f,0.52f, 0.75f,0.55f,0.40f);
             glPushMatrix();
