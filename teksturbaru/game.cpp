@@ -53,7 +53,7 @@ void initGame() {
             worldToGrid(zomX[i], zomZ[i], gx, gz);
         } while ((!worldToGrid(zomX[i],zomZ[i],gx,gz) ||
                   !isWalkable(gx,gz) ||
-                  positionHitsTable(zomX[i],zomZ[i])) && tries < 100);
+                  positionHitsObjects(zomX[i],zomZ[i])) && tries < 100);
 
         zomAngleY[i]     = 0.0f;
         lastPathUpdate[i] = 0;
@@ -128,7 +128,7 @@ void resetGame() {
             worldToGrid(zomX[i],zomZ[i],gx,gz);
         } while ((!worldToGrid(zomX[i],zomZ[i],gx,gz) ||
                   !isWalkable(gx,gz) ||
-                  positionHitsTable(zomX[i],zomZ[i])) && tries<100);
+                  positionHitsObjects(zomX[i],zomZ[i])) && tries<100);
 
         zomAngleY[i]     = 0.0f;
         lastPathUpdate[i] = 0;
@@ -143,16 +143,24 @@ void resetGame() {
 
 // ===================== ZOMBIE ATTACK ===================== //
 void zombieAttack() {
-    int currentTime = glutGet(GLUT_ELAPSED_TIME);
-    if (isDead) return;
+    /* === KAMUS LOKAL === */
+    int currentTime, i;
+    AABB playerBox;
 
-    AABB playerBox = getPlayerAABB();
-    for (int i=0; i<numZombies; i++) {
-        if (checkAABB(playerBox, getZombieAABB(i))) {
-            if (currentTime - lastDamageTime > damageDelay) {
-                playerHealth -= 10;
-                lastDamageTime = currentTime;
-                if (playerHealth <= 0) { isDead=true; break; }
+    /* === ALGORITMA === */
+    currentTime = glutGet(GLUT_ELAPSED_TIME);
+    if (!isDead) {
+        playerBox = getPlayerAABB();
+        for (i = 0; i < numZombies; i++) {
+            if (checkAABB(playerBox, getZombieAABB(i))) {
+                if (currentTime - lastDamageTime > damageDelay) {
+                    playerHealth -= 10;
+                    lastDamageTime = currentTime;
+                    if (playerHealth <= 0) {
+                        isDead = true;
+                        break;
+                    }
+                }
             }
         }
     }

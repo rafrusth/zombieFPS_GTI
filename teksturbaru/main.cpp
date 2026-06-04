@@ -267,10 +267,10 @@ void timer(int v) {
     updateMovement();
 
     int currentTime = glutGet(GLUT_ELAPSED_TIME);
-    for (int i=0;i<numZombies;i++) {
+    for (int i = 0;i < numZombies;i++) {
         if (currentTime - lastPathUpdate[i] > 500 + i*35) {
             calculateZombiePath(i);
-            lastPathUpdate[i]=currentTime;
+            lastPathUpdate[i] = currentTime;
         }
         updateZombie(i);
     }

@@ -20,7 +20,13 @@ void gridToWorld(int gx, int gz, float &wx, float &wz) {
 }
 
 bool isWalkable(int gx, int gz) {
-    if (gx < 0 || gx >= GRID_W || gz < 0 || gz >= GRID_H) return false;
+    /* === KAMUS LOKAL === */
+    
+    /* === ALGORITMA === */
+    if (gx < 0 || gx >= GRID_W || gz < 0 || gz >= GRID_H) {
+        return false;
+    }
+
     return pathGrid[gx][gz] == 0;
 }
 
@@ -87,22 +93,46 @@ void buildPathGrid() {
 
 // ===================== HELPER A* ===================== //
 static int heuristic(int x1, int z1, int x2, int z2) {
+    /* === KAMUS LOKAL === */
+
+    /* === ALGORITMA === */
     return abs(x1 - x2) + abs(z1 - z2);
 }
 
 static bool findNearestWalkable(int sx, int sz, int &outX, int &outZ) {
+    /* === KAMUS LOKAL === */
     int r, x, z;
-    if (isWalkable(sx, sz)) { outX = sx; outZ = sz; return true; }
-    for (r = 1; r <= 10; r++)
-        for (x = sx - r; x <= sx + r; x++)
-            for (z = sz - r; z <= sz + r; z++)
-                if (isWalkable(x, z)) { outX = x; outZ = z; return true; }
+
+    /* === ALGORITMA === */
+    if (isWalkable(sx, sz)) {
+        outX = sx;
+        outZ = sz;
+
+        return true;
+    }
+
+    for (r = 1; r <= 10; r++) {
+        for (x = sx - r; x <= sx + r; x++) {
+            for (z = sz - r; z <= sz + r; z++) {
+                if (isWalkable(x, z)) {
+                    outX = x;
+                    outZ = z;
+
+                    return true;
+                }
+            }
+        }
+    }
+    
     return false;
 }
 
 struct AStarItem {
     int x, z, f;
-    bool operator<(const AStarItem &o) const { return f > o.f; }
+
+    bool operator<(const AStarItem &o) const {
+        return f > o.f;
+    }
 };
 
 // ===================== A* ===================== //
@@ -117,7 +147,6 @@ static bool findPathAStar(int startX, int startZ, int goalX, int goalZ, std::vec
     std::vector<PathNode> rev;
     std::priority_queue<AStarItem> open;
 
-
     int dx4[4] = {1, -1, 0, 0};
     int dz4[4] = {0, 0, 1, -1};
     int x, z, dir, k, nx, ng, nz;
@@ -130,13 +159,14 @@ static bool findPathAStar(int startX, int startZ, int goalX, int goalZ, std::vec
             return false;
         }
 
-    for (x = 0; x < GRID_W; x++)
+    for (x = 0; x < GRID_W; x++) {
         for (z = 0; z < GRID_H; z++) {
             gCost[x][z] = 999999;
             closedSet[x][z] = false;
             parent[x][z].x = -1;
             parent[x][z].z = -1;
         }
+    }
 
     gCost[startX][startZ] = 0;
     si.x = startX;
@@ -147,9 +177,11 @@ static bool findPathAStar(int startX, int startZ, int goalX, int goalZ, std::vec
     while (!open.empty()) {
         cur = open.top();
         open.pop();
+
         if (closedSet[cur.x][cur.z]) {
             continue;
         }
+        
         closedSet[cur.x][cur.z] = true;
 
         if (cur.x == goalX && cur.z == goalZ) {
@@ -193,6 +225,7 @@ static bool findPathAStar(int startX, int startZ, int goalX, int goalZ, std::vec
             }
         }
     }
+
     return false;
 }
 
