@@ -284,34 +284,59 @@ static bool tryMoveZombie(int i, float dirX, float dirZ, float speedMul) {
 }
 
 static void doSteeringAvoidance(int i, float desiredX, float desiredZ) {
-    float rX =  desiredZ, rZ = -desiredX;
-    float lX = -desiredZ, lZ =  desiredX;
-    float drX = desiredX * 0.55f + rX * 0.85f, drZ = desiredZ * 0.55f + rZ * 0.85f;
-    float dlX = desiredX * 0.55f + lX * 0.85f, dlZ = desiredZ * 0.55f + lZ * 0.85f;
-    float brX = -desiredX * 0.25f + rX,         brZ = -desiredZ * 0.25f + rZ;
-    float blX = -desiredX * 0.25f + lX,         blZ = -desiredZ * 0.25f + lZ;
-    if (tryMoveZombie(i, drX, drZ, 0.8f))  return;
-    if (tryMoveZombie(i, dlX, dlZ, 0.8f))  return;
-    if (tryMoveZombie(i,  rX,  rZ, 0.65f)) return;
-    if (tryMoveZombie(i,  lX,  lZ, 0.65f)) return;
-    if (tryMoveZombie(i, brX, brZ, 0.45f)) return;
-    if (tryMoveZombie(i, blX, blZ, 0.45f)) return;
+    /* === KAMUS LOKAL === */
+    float rX, rZ, lX, lZ, drX, drZ, dlX, dlZ, brX, brZ, blX, blZ;
+
+    /* === ALGORITMA === */
+    rX = desiredZ;
+    rZ = -desiredX;
+    lX = -desiredZ;
+    lZ = desiredX;
+    drX = desiredX * 0.55f + rX * 0.85f;
+    drZ = desiredZ * 0.55f + rZ * 0.85f;
+    dlX = desiredX * 0.55f + lX * 0.85f;
+    dlZ = desiredZ * 0.55f + lZ * 0.85f;
+    brX = -desiredX * 0.25f + rX;
+    brZ = -desiredZ * 0.25f + rZ;
+    blX = -desiredX * 0.25f + lX;
+    blZ = -desiredZ * 0.25f + lZ;
+
+    if (tryMoveZombie(i, drX, drZ, 0.8f)
+        ||
+        tryMoveZombie(i, dlX, dlZ, 0.8f)
+        ||
+        tryMoveZombie(i, rX, rZ, 0.65f)
+        ||
+        tryMoveZombie(i, lX, lZ, 0.65f)
+        ||
+        tryMoveZombie(i, brX, brZ, 0.45f)
+        ||
+        tryMoveZombie(i, blX, blZ, 0.45f)) {
+            return;
+        }
 }
 
 // ===================== UPDATE ZOMBIE ===================== //
 void updateZombie(int i) {
+    /* === KAMUS LOKAL === */
     float targetX, targetZ, dx, dz, dist, dpx, dpz, dX, dZ, step, nx, nz;
-    if (isDead) return;
+    PathNode next;
 
-    if (!zombiePath[i].empty()) {
-        PathNode next = zombiePath[i][0];
-        gridToWorld(next.x, next.z, targetX, targetZ);
-    } else {
-        targetX = posX; targetZ = posZ;
+    /* === ALGORITMA === */
+    if (isDead) {
+        return;
     }
 
-    dx   = targetX - zomX[i];
-    dz   = targetZ - zomZ[i];
+    if (!zombiePath[i].empty()) {
+        next = zombiePath[i][0];
+        gridToWorld(next.x, next.z, targetX, targetZ);
+    } else {
+        targetX = posX;
+        targetZ = posZ;
+    }
+
+    dx = targetX - zomX[i];
+    dz = targetZ - zomZ[i];
     dist = sqrt(dx * dx + dz * dz);
 
     if (dist < 0.12f && !zombiePath[i].empty()) {
@@ -321,23 +346,34 @@ void updateZombie(int i) {
 
     dpx = posX - zomX[i];
     dpz = posZ - zomZ[i];
-    if (sqrt(dpx * dpx + dpz * dpz) <= stopDistance) return;
+    if (sqrt(dpx * dpx + dpz * dpz) <= stopDistance) {
+        return;
+    }
 
-    dx   = targetX - zomX[i];
-    dz   = targetZ - zomZ[i];
+    dx = targetX - zomX[i];
+    dz = targetZ - zomZ[i];
     dist = sqrt(dx * dx + dz * dz);
-    if (dist <= 0.001f) return;
+    if (dist <= 0.001f) {
+        return;
+    }
 
-    dX   = dx / dist;
-    dZ   = dz / dist;
-    step = (zomSpeed < dist) ? zomSpeed : dist;
-    nx   = zomX[i] + dX * step;
-    nz   = zomZ[i] + dZ * step;
+    dX = dx / dist;
+    dZ = dz / dist;
 
-    if (positionHitsObjects(nx, nz))
+    if (zomSpeed < dist) {
+        step = zomSpeed;
+    } else {
+        step = dist;
+    }
+
+    nx = zomX[i] + dX * step;
+    nz = zomZ[i] + dZ * step;
+
+    if (positionHitsObjects(nx, nz)) {
         doSteeringAvoidance(i, dX, dZ);
-    else {
-        zomX[i]      = nx; zomZ[i] = nz;
+    } else {
+        zomX[i] = nx;
+        zomZ[i] = nz;
         zomAngleY[i] = atan2(-dX, -dZ) * 180.0f / 3.14159265f;
     }
 }

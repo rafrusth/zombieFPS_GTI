@@ -4,12 +4,12 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = render.o pathfinding.o main.o hud.o globals.o game.o aabb.o
-LINKOBJ  = render.o pathfinding.o main.o hud.o globals.o game.o aabb.o
+OBJ      = aabb.o game.o globals.o hud.o main.o pathfinding.o render.o
+LINKOBJ  = aabb.o game.o globals.o hud.o main.o pathfinding.o render.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/lib" -lopengl32 -lglu32 -lfreeglut -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.8.1/include/c++"
-BIN      = Project1.exe
+BIN      = ZombieVerse.exe
 CXXFLAGS = $(CXXINCS) -g3 -mwindows
 CFLAGS   = $(INCS) -g3 -mwindows
 RM       = rm.exe -f
@@ -24,23 +24,23 @@ clean: clean-custom
 $(BIN): $(OBJ)
 	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
 
-render.o: render.cpp
-	$(CPP) -c render.cpp -o render.o $(CXXFLAGS)
-
-pathfinding.o: pathfinding.cpp
-	$(CPP) -c pathfinding.cpp -o pathfinding.o $(CXXFLAGS)
-
-main.o: main.cpp
-	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
-
-hud.o: hud.cpp
-	$(CPP) -c hud.cpp -o hud.o $(CXXFLAGS)
-
-globals.o: globals.cpp
-	$(CPP) -c globals.cpp -o globals.o $(CXXFLAGS)
+aabb.o: aabb.cpp
+	$(CPP) -c aabb.cpp -o aabb.o $(CXXFLAGS)
 
 game.o: game.cpp
 	$(CPP) -c game.cpp -o game.o $(CXXFLAGS)
 
-aabb.o: aabb.cpp
-	$(CPP) -c aabb.cpp -o aabb.o $(CXXFLAGS)
+globals.o: globals.cpp
+	$(CPP) -c globals.cpp -o globals.o $(CXXFLAGS)
+
+hud.o: hud.cpp
+	$(CPP) -c hud.cpp -o hud.o $(CXXFLAGS)
+
+main.o: main.cpp
+	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
+
+pathfinding.o: pathfinding.cpp
+	$(CPP) -c pathfinding.cpp -o pathfinding.o $(CXXFLAGS)
+
+render.o: render.cpp
+	$(CPP) -c render.cpp -o render.o $(CXXFLAGS)
