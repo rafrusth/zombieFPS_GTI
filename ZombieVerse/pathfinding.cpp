@@ -15,6 +15,9 @@ bool worldToGrid(float wx, float wz, int &gx, int &gz) {
 }
 
 void gridToWorld(int gx, int gz, float &wx, float &wz) {
+    /* === KAMUS LOKAL === */
+    
+    /* === ALGORITMA === */
     wx = WORLD_MIN_X + gx * CELL_SIZE + CELL_SIZE * 0.5f;
     wz = WORLD_MIN_Z + gz * CELL_SIZE + CELL_SIZE * 0.5f;
 }
