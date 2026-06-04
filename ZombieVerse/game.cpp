@@ -236,11 +236,7 @@ void shoot() {
 
         t = dx * dirX + dz * dirZ;
 
-        if (t < 0.0f) {
-            continue;
-        }
-        
-        if (t > 100.0f) {
+        if (t < 0.0f || t > 100.0f) {
             continue;
         }
 
