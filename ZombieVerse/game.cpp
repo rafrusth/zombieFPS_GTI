@@ -203,8 +203,8 @@ void zombieAttack() {
 void shoot() {
     /* === KAMUS LOKAL === */
     float rad, dirX, dirZ;
-    float dist, dx, dz, dot;
-    int i, j;
+    float dx, dz, closestX, closestZ, distX, distZ, distanceToRaySq, hitboxRadiusSq;
+    int i, j, t;
     
     /* === ALGORITMA === */
     if (isDead || isWin) {
@@ -233,20 +233,31 @@ void shoot() {
 
         dx = zomX[i] - posX;
         dz = zomZ[i] - posZ;
-        dist = sqrt(dx * dx + dz * dz);
 
-        if (dist > 100.0f) {
+        t = dx * dirX + dz * dirZ;
+
+        if (t < 0.0f) {
+            continue;
+        }
+        
+        if (t > 100.0f) {
             continue;
         }
 
-        dot = (dx * dirX + dz * dirZ) / dist;
+        closestX = dirX * t;
+        closestZ = dirZ * t;
 
-        if (dot > 0.9999f) {
+        distX = dx - closestX;
+        distZ = dz - closestZ;
+        distanceToRaySq = (distX * distX) + (distZ * distZ);
 
+        hitboxRadiusSq = 0.5f; 
+
+        if (distanceToRaySq <= hitboxRadiusSq) {
+            
             zombieHealth[i] -= 15.0f;
 
             if (zombieHealth[i] <= 0) {
-
                 for (j = i; j < numZombies - 1; j++) {
                     zomX[j] = zomX[j + 1];
                     zomZ[j] = zomZ[j + 1];
@@ -257,11 +268,12 @@ void shoot() {
                 }
 
                 numZombies--;
+
                 if (numZombies <= 0) {
                     isWin = true;
-				}
+                }
             }
-
+            
             break;
         }
     }

@@ -387,23 +387,16 @@ void timer(int v) {
 // ===================== MOUSE ===================== //
 void mouseMove(int x, int y) {
     /* === KAMUS LOKAL === */
-    static int lastX = 500, lastY = 350;
-    static bool first = true;
+    static int centerX = 640, centerY = 360;
     int dx, dy;
 
     /* === ALGORITMA === */
-    if (first) {
-        lastX = x;
-        lastY = y;
-        first = false;
-
+    if (x == centerX && y == centerY) {
         return; 
     }
 
-    dx = x - lastX;
-    dy = y - lastY;
-    lastX = x;
-    lastY = y;
+    dx = x - centerX;
+    dy = y - centerY;
 
     camAngleY += dx * 0.2f;
     camAngleX += dy * 0.2f;
@@ -412,14 +405,10 @@ void mouseMove(int x, int y) {
         camAngleX = 85;
     }
     if (camAngleX < -85) {
-        camAngleX =- 85;
+        camAngleX = -85;
     }
 
-    if (x < 100 || x > 900 || y < 100 || y > 600) {
-        lastX = 500;
-        lastY = 350;
-        glutWarpPointer(500,350);
-    }
+    glutWarpPointer(centerX, centerY);
 }
 
 void rapidFireTimer(int value) {
