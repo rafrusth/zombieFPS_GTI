@@ -221,10 +221,16 @@ static bool findPathAStar(int startX, int startZ, int goalX, int goalZ, std::vec
 }
 
 void calculateZombiePath(int i) {
+    /* === KAMUS LOKAL === */
     int sx, sz, gx, gz;
+
+    /* === ALGORITMA === */
     zombiePath[i].clear();
-    if (!worldToGrid(zomX[i], zomZ[i], sx, sz)) return;
-    if (!worldToGrid(posX,    posZ,    gx, gz))  return;
+    if (!worldToGrid(zomX[i], zomZ[i], sx, sz)
+        ||
+        !worldToGrid(posX, posZ, gx, gz)) {
+            return;
+        }
     findPathAStar(sx, sz, gx, gz, zombiePath[i]);
 }
 
