@@ -3,6 +3,7 @@
 
 #include "globals.h"
 
+static void worldToMap(float wx, float wz, float &sx, float &sy);
 void drawMiniMap();
 void drawHUD();
 

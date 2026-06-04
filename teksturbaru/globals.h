@@ -94,8 +94,8 @@ const float WORLD_MIN_X = -50.0f;
 const float WORLD_MIN_Z = -50.0f;
 
 extern int pathGrid[GRID_W][GRID_H];
-extern std::vector<PathNode> zombiePath[LIMIT_ZOMBIES];
 extern int lastPathUpdate[LIMIT_ZOMBIES];
+extern std::vector<PathNode> zombiePath[LIMIT_ZOMBIES];
 
 // ===================== MINI-MAP ===================== //
 const float MAP_X            = 20.0f;
@@ -106,4 +106,3 @@ const float MAP_WORLD_RANGE  = 40.0f;
 extern float g_mapX, g_mapY, g_mapSize, g_mapScale;
 
 #endif
-

@@ -10,4 +10,3 @@ AABB getPohonAABB(int i);
 AABB getZombieAABB(int i);
 
 #endif
-

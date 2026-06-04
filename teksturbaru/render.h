@@ -12,14 +12,26 @@ void drawCuboid(float w, float h, float d,
 void drawCuboid(float w, float h, float d);
 void drawFrontPatch(float px, float py, float pw, float ph,
                     float z, float r, float g, float b);
+
+static void drawHeadZombie();
+static void drawBodyZombie();
+static void drawArmZombie();
+static void drawLegZombie();
+static void drawBucketHat();
+void drawZombie();
+
 void drawPistol();
 void drawHandHUD(float xPos, float rotation, float currentRecoil);
-void drawZombie();
 void drawPlayer(float size);
+
+static void drawTableFace();
+static void drawTableFoot();
 void drawTable();
+
 void drawPohon(Pohon p);
 void drawSky();
 void applyProjection();
+
 GLuint loadBMPTexture(const char* filename);
 void renderText(float x, float y, void* font, const char* string);
 

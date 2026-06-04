@@ -30,9 +30,7 @@ bool isWalkable(int gx, int gz) {
     return pathGrid[gx][gz] == 0;
 }
 
-// ===================== MARK OBSTACLE (ganti lambda) ===================== //
-static int _minGX, _maxGX, _minGZ, _maxGZ;
-
+// ===================== MARK OBSTACLE ===================== //
 static void markObstacle(float cx, float cz, float hw, float hd) {
     /* === KAMUS LOKAL === */
     int gx, gz;
@@ -127,13 +125,6 @@ static bool findNearestWalkable(int sx, int sz, int &outX, int &outZ) {
     return false;
 }
 
-struct AStarItem {
-    int x, z, f;
-
-    bool operator<(const AStarItem &o) const {
-        return f > o.f;
-    }
-};
 
 // ===================== A* ===================== //
 static bool findPathAStar(int startX, int startZ, int goalX, int goalZ, std::vector<PathNode> &outPath) {
@@ -350,5 +341,3 @@ void updateZombie(int i) {
         zomAngleY[i] = atan2(-dX, -dZ) * 180.0f / 3.14159265f;
     }
 }
-
-
