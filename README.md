@@ -1,8 +1,11 @@
 # ZombieVerse 🧟‍♀️
 
+<p style="text-align: justify;">
 Game ini merupakan tembak-menembak untuk mengalahkan segerombolan zombie yang sedang mengincarmu.. Ambil ammo, berlindung di balik pohon maupun meja, tetapi mereka akan tetap mengejar.. 🗿
-
+  
 Siapkan bidikan senjata yang presisi untuk menembak semua zombie yang ada! Dengan begitu, para zombie akan meninggal. Jika beruntung menembakkan semua zombie.. anda akan menang! Jika tidak beruntung dan meninggal dimakan zombie.. anda akan kalah.
+</p>
+
 
 <img width="480" height="270" alt="ZombieVerse" src="https://github.com/user-attachments/assets/bea334f8-78c3-4959-afa5-c7aab7aeca5d" />
 
