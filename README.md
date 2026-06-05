@@ -49,6 +49,7 @@ Siapkan bidikan senjata yang presisi untuk menembak semua zombie yang ada! Denga
 | `W` `A` `S` `D` | Gerak Maju / Kiri / Mundur / Kanan |
 | `Mouse` | Arahkan Pandangan |
 | `LMB` (Klik Mouse Kiri) | Tembak |
+| `E` | Reload |
 | `1` `2` `3` `4` | Ganti Mode Kamera |
 | `=` / `-` | Zoom In / Out (Mode 2-4) |
 | `R` | Restart (saat Game Over atau Menang) |
