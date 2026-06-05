@@ -4,6 +4,8 @@ Game ini merupakan tembak-menembak untuk mengalahkan segerombolan zombie yang se
 
 Siapkan bidikan senjata yang presisi untuk menembak semua zombie yang ada! Dengan begitu, para zombie akan meninggal. Jika beruntung menembakkan semua zombie.. anda akan menang! Jika tidak beruntung dan meninggal dimakan zombie.. anda akan kalah.
 
+<img width="480" height="270" alt="ZombieVerse" src="https://github.com/user-attachments/assets/bea334f8-78c3-4959-afa5-c7aab7aeca5d" />
+
 ## Authors 👨‍💻👩‍💻
 
 - [@Felicia](https://www.github.com/Feliscantik)
@@ -29,4 +31,8 @@ Latest Version: 1.0
 
 - Lose Condition
 <img width="1282" height="752" alt="image" src="https://github.com/user-attachments/assets/9cf1ff4a-d884-49b4-9264-bb2bfa91181e" />
+
+
+
+
 
